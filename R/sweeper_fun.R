@@ -10,6 +10,7 @@
 #' @param sheets TRUE or FALSE. Indicates whether data is stored within multiple excel sheets. Defaults to FALSE.
 #' @param type The type of datasheet to be cleaned: either 'abundance' or 'pool'. Defaults to 'abundance'.
 #' @return A preprocessed datasheet.
+#' @import dplyr
 #' @export
 
 sweep_fun <- function(path = NULL,
