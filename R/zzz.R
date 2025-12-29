@@ -140,7 +140,7 @@ geocode_missing_coords <- function(df, state_name) {
     )
 
   df <- df %>%
-    dplyr::mutate(address_clean = stringr::str_to_upper(str_trim(address))) %>%
+    dplyr::mutate(address_clean = stringr::str_to_upper(stringr::str_trim(address))) %>%
     dplyr::left_join(
       geo.df %>%
         dplyr::mutate(address_clean = stringr::str_to_upper(stringr::str_trim(address))) %>%
