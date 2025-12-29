@@ -56,7 +56,7 @@ sweep_fun <- function(path = NULL,
         dplyr::mutate(state = state_name) %>%
         standard_genus() %>%
         parse_coords() %>%
-        geocode_missing_coords(state_name, dirs) %>%
+        geocode_missing_coords(state_name) %>%
         propagate_coords() %>%
         filter_females() %>%
         std_fun()
