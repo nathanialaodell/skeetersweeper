@@ -9,7 +9,7 @@ loader_fun <- function(path, extensions = NULL, sheets = FALSE){
     temp.list <- path %>%
       readxl::excel_sheets() %>%
       purrr::set_names() %>%
-      purrr::map(read_excel, path = path)
+      purrr::map(readxl::read_excel, path = path)
 
   }
 
