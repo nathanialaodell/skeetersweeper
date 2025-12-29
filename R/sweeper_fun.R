@@ -11,6 +11,9 @@
 #' @param type The type of datasheet to be cleaned: either 'abundance' or 'pool'. Defaults to 'abundance'.
 #' @return A preprocessed datasheet.
 #' @import dplyr
+#' @import parzer
+#' @import janitor
+#' @import readxl
 #' @export
 
 sweep_fun <- function(path = NULL,

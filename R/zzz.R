@@ -9,7 +9,7 @@ loader_fun <- function(path, extensions = NULL, sheets = FALSE){
     temp.list <- path %>%
       readxl::excel_sheets() %>%
       purrr::set_names() %>%
-      purrr::map(readxl::read_excel, path = path)
+      purrr::map(read_excel, path = path)
 
   }
 
@@ -24,7 +24,7 @@ loader_fun <- function(path, extensions = NULL, sheets = FALSE){
   }
 
   temp.list %>%
-    lapply(janitor::clean_names)
+    lapply(clean_names)
 }
 
 #----------------------------------------
