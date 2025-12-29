@@ -92,12 +92,12 @@ skeeter_path = here("interesting collections in sheets.csv")
 sweep_fun(path = skeeter_path, state_name = "WY", sheets = TRUE)
 ```
 
-Path that is comprised of multiple .xslx files containing pool data:
+Path that is comprised of multiple .xslx files with multiple sheets containing pool data:
 
 ```{r}
-skeeter_path <- c(here("interesting collections 1.csv"),
-here("interesting collections 2.csv")
+skeeter_path <- c(here("interesting collections 2000-2004.xlsx"),
+here("interesting collections 2005-2008.xlsx")
 )
 
-sweep_fun(extensions = skeeter.stack, state_name = "WY", type = "pool")
+sweep_fun(extensions = skeeter.stack, state_name = "WY", type = "pool", sheets = TRUE)
 ```
