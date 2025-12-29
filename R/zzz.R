@@ -76,10 +76,6 @@ parse_coords <- function(df){
 
 geocode_missing_coords <- function(df, state_name) {
 
-  dirs <- postmastr::pm_dictionary(type = "directional",
-                                   filter = c("N", "S", "E", "W"),
-                                   locale = "us")
-
   df$state <- state_name
 
   if (!("city" %in% names(df)) ||
@@ -100,7 +96,10 @@ geocode_missing_coords <- function(df, state_name) {
 
   min <- postmastr::pm_house_parse(min)
 
-  min <- postmastr::pm_streetDir_parse(min, dictionary = dirs)
+  min <- postmastr::pm_streetDir_parse(min,
+                                       dictionary = postmastr::pm_dictionary(type = "directional",
+                                                                                  filter = c("N", "S", "E", "W"),
+                                                                                  locale = "us"))
 
   # error checking
   str(na_df$address)
