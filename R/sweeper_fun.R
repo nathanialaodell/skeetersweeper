@@ -14,6 +14,7 @@
 #' @import parzer
 #' @import janitor
 #' @import readxl
+#' @import tidyverse
 #' @export
 
 sweep_fun <- function(path = NULL,
