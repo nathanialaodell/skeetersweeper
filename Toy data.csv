@@ -1,0 +1,11 @@
+county,recd_date,address,sampled_date,collection_method,latitude,longitude,pool_number,mosquito_id,number_of_mosquitoes
+Dallas,07/24/2008,1,10/07/2009,sugar cup,NA,96.875399999999999,4143,Culex species,140
+Dallas,07/24/2008,2,06/09/2009,sugar cup,N32 45.192,96.890460000000004,342,Culex quinquefasciatus,135
+Dallas,07/24/2008,3,04/10/2009,sugar cup,N32 39.531,W096 058.183,6873,Culex quinquefasciatus,273
+Dallas,07/24/2008,4,02/21/2003,sugar cup,32.930300000000003,W097 03.107,1206,Culex quinquefasciatus,20
+Dallas,07/24/2008,5,03/15/2011,sugar cup,N32 39.531,W097 03.107,6932,Aedes albopictus,294
+Dallas,07/24/2008,6,11/18/2018,sugar cup,N32 48.728,W097 03.107,5756,Culex quinquefasciatus,251
+Dallas,07/24/2008,7,03/09/2010,sugar cup,N32 39.531,W097 00.170,1898,Culex quinquefasciatus,213
+Dallas,07/24/2008,8,11/09/2023,sugar cup,32.929900000000004,W097 00.170,2852,Culex quinquefasciatus,255
+Dallas,07/24/2008,9,06/20/2017,sugar cup,N32 48.728,W097 01.509,435,Culex quinquefasciatus,194
+Dallas,07/24/2008,10,01/11/2000,sugar cup,N32 45.192,NA,2069,Culex quinquefasciatus,239

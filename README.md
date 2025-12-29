@@ -2,7 +2,7 @@
 
 ### Preamble
 
-This (work in progress) repo will include function(s) needed to clean state-specific vector control data. Toy data will be added for example purposes at some point in the near future.
+This (work in progress) repo will include function(s) needed to clean state-specific vector control data. 'Toy data.csv' is available for extremely lightweight example purposes.
 
 ### Sweep_fun
 
