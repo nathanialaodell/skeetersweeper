@@ -229,7 +229,7 @@ filter_outside_counties <- function(df, state_name) {
 
   for (county_name in unique(df$county)) {
 
-    bbox <- st_bbox(
+    bbox <- sf::st_bbox(
       dplyr::filter(county_shapes, NAME == county_name)
     )
 

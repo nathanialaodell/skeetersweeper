@@ -2,15 +2,16 @@
 
 ### Preamble
 
-This (work in progress) repo will include function(s) needed to clean state-specific vector control data. 'Toy data.csv' is available for extremely lightweight example purposes.
+This (work in progress) repo will include function(s) needed to clean state-specific vector control data. 
+
+[!CAUTION]
+This package is currently intended for INTERNAL use only and has not been subject to CRAN review. 
 
 ### Sweep_fun
 
-The primary cleaning function, 'sweep_fun', is broken up into two sections. One for abundance datasheet cleaning, and the other for pools.
-
 The 'sweep' function is a function that takes a raw, potentially messy .csv, .xlsx, or .xls file and both cleans and standardizes species collection and geospatial information.
 
-The following table describes the functions arguments.
+The following table describes the function's arguments.
 
 | Argument | Description |
 |----------------------|-------------------------------------------------|
@@ -24,12 +25,9 @@ The 'sweep' function can be split into a few sections and accomplishes multiple 
 
 1)  Standardizing the genus representation for *Aedes* (Ae), *Culex* (Cu), *Anopheles* (An), and *Psorophora* (P); ensuring that different agency standards for species ID'ing inputs don't impact statistical analyses.
 2)  For agencies that record street addresses of trap locations (as opposed to giving traps unique identifiers), address representation is standardized to *HOUSE NUMBER* *STREET NAME* *STREET SUFFIX*
-
-3a) Parse geoocoordinates to ensure they are in degree decimal format (via 'parzer')
-
-3b) Geocode addresses with missing or obviously incorrect geocoordinates (outside of the county's bounding box via 'tigris'--an imperfect but reasonable solution)
-
-4)  Subset data to only include female collections
+3) Parse geoocoordinates to ensure they are in degree decimal format (via 'parzer')
+4) Geocode addresses with missing or obviously incorrect geocoordinates (outside of the county's bounding box via 'tigris'--an imperfect but reasonable solution). Observations are removed if geocode result is empty.
+5)  Subset data to only include female collections
 
 **Thus, this function has the following limitations and assumptions (specifically with respect to the data input format)**.
 
@@ -76,6 +74,17 @@ The procedure is identical to the one described above except for the following c
 
 ### Examples
 
+```{r}
+devtools::install_github('nathanialaodell/skeetersweeper')
+library(skeetersweeper)
+```
+
+'Toy data.csv' is available for extremely lightweight example purposes:
+
+```{r}
+data <- read.csv('https://raw.githubusercontent.com/nathanialaodell/skeetersweeper/refs/heads/main/Toy%20data.csv')
+```
+
 Path that is comprised of one .csv file containing abundance data:
 
 ```{r}
@@ -95,7 +104,7 @@ sweep_fun(path = skeeter_path, state_name = "WY", sheets = TRUE)
 Path that is comprised of multiple .xslx files with multiple sheets containing pool data:
 
 ```{r}
-skeeter_path <- c(here("interesting collections 2000-2004.xlsx"),
+skeeter_stack <- c(here("interesting collections 2000-2004.xlsx"),
 here("interesting collections 2005-2008.xlsx")
 )
 

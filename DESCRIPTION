@@ -3,7 +3,7 @@ Title: Quickly process mosquito data
 Version: 0.0.0.9000
 Authors@R: 
     person("Nathanial", "O'Dell", , "naodell@uw.com", role = c("aut", "cre"))
-Description: skeetersweeper takes a raw, potentially messy .csv, .xlsx, or .xls file and both cleans and standardizes species collection and geospatial information. Standardizes the genus representation for Aedes (Ae), Culex (Cu), Anopheles (An), and Psorophora (P); ensuring that different agency standards for species ID'ing inputs don't impact statistical analyses; for agencies that record street addresses of trap locations (as opposed to giving traps unique identifiers), address representation is standardized to HOUSE NUMBER STREET NAME STREET SUFFIX; parses geoocoordinates to ensure they are in degree decimal format (via 'parzer'); geocodes addresses with missing or obviously incorrect geocoordinates (outside of the county's bounding box via 'tigris'--an imperfect but reasonable solution); subsets data to only include female collections
+Description: State mosquito surveillance clean up tool.
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Encoding: UTF-8
@@ -12,3 +12,11 @@ RoxygenNote: 7.3.3.9000
 Depends: 
     R (>= 3.5)
 LazyData: true
+Imports: 
+    dplyr,
+    parzer (>= 0.4.4),
+    postmastr (>= 0.1.0.9000),
+    purrr (>= 1.0.2),
+    readxl (>= 1.4.3),
+    stringr (>= 1.5.1),
+    tidygeocoder (>= 1.0.5)
