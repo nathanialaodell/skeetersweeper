@@ -1,11 +1,11 @@
 # skeetersweep
 
+> [!CAUTION]
+> This package is currently intended for INTERNAL use for thesis work at the University of Washington and has not been subject to CRAN review. 
+
 ### Preamble
 
 This (work in progress) repo will include function(s) needed to clean state-specific vector control data. 
-
-> [!CAUTION]
-> This package is currently intended for INTERNAL use only and has not been subject to CRAN review. 
 
 ### Sweep_fun
 
