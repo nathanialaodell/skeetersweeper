@@ -1,7 +1,7 @@
 # skeetersweep
 
 > [!CAUTION]
-> This package is currently intended for INTERNAL use for thesis work at the University of Washington and has not been subject to CRAN review. 
+> This package is currently intended for INTERNAL use in thesis work at the University of Washington and has not been subject to CRAN review. 
 
 ### Preamble
 
@@ -9,6 +9,7 @@ This (work in progress) repo will include function(s) needed to clean state-spec
 
 ### Sweep_fun
 
+---
 The 'sweep' function is a function that takes a raw, potentially messy .csv, .xlsx, or .xls file and both cleans and standardizes species collection and geospatial information.
 
 The following table describes the function's arguments.
@@ -55,8 +56,8 @@ The 'sweep' function can be split into a few sections and accomplishes multiple 
 3c) As a corollary to this: the 'sweep' function is just that--a function to perform the basic pre-processing needed to get your hands on somewhat-usable-not-totally-useless vector data. The 'mop' portion (work in progress)--which is intended to tackle the more complex and minute errors/issues--is a process that'll look different from dataset to dataset.
 
 ### Pools information cleaning
----
 
+---
 The procedure is identical to the one described above except for the following changes to the required input data structure (marked in bold):
 
 | Variable | Description |
@@ -74,6 +75,7 @@ The procedure is identical to the one described above except for the following c
 
 ### Examples
 
+---
 ```{r}
 devtools::install_github('nathanialaodell/skeetersweeper')
 library(skeetersweeper)
