@@ -4,11 +4,12 @@
 #' @param start_date Date. The first date in a range of days to download data for.
 #' @param end_date Date. The last date in a range of days to download data for.
 #' @param path Character. The location that data will be downloaded to. Defaults to working directory.
+#' @param remove Logical. Removes zip files after extraction; HIGHLY recommended. Defaults to TRUE.
 #' @import lubridate
 #' @import janitor
 #' @export
 
-prism8_daily <- function(var, start_date, end_date, path = getwd()){
+prism8_daily <- function(var, start_date, end_date, path = getwd(), remove = TRUE){
 
   dir <- path
   clim_var <- var
@@ -27,6 +28,10 @@ prism8_daily <- function(var, start_date, end_date, path = getwd()){
     download.file(url, destfile = dest_file, mode = "wb")
 
     unzip(dest_file, exdir = dir)
+
+    if(remove){
+      file.remove(dest_file)
+    }
 
     Sys.sleep(2)  # polite pause
   }
