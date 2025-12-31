@@ -26,13 +26,9 @@ prism8_daily <- function(var, start_date, end_date, path = getwd()){
     dest_file <- file.path(dir, paste0(clim_var, "_", day, ".bil.zip"))
     download.file(url, destfile = dest_file, mode = "wb")
 
+    unzip(dest_file, exdir = dir)
+
     Sys.sleep(2)  # polite pause
-  }
-
-  zip_files <- list.files(dir, pattern = "\\.zip$", full.names = TRUE)
-
-  for (z in zip_files) {
-    unzip(z, exdir = dir)
   }
 
 }
