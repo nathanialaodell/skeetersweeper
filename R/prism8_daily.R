@@ -18,7 +18,7 @@ prism8_daily <- function(var, start_date, end_date, date_list = NULL,
 
   if (!is.null(date_list)){
     for (i in seq_along(date_list)){
-      day <- strftime(dates_list[[i]], "%Y%m%d")
+      day <- strftime(date_list[[i]], "%Y%m%d")
       url <- paste0(base_url, "/", clim_var, "/", day, "?format=bil")
 
       # Download file into temp folder
