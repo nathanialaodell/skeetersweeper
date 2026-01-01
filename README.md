@@ -1,9 +1,13 @@
 # skeetersweeper
 
-> [!CAUTION]
-> This package is currently intended for INTERNAL use in thesis work at the University of Washington and has not been subject to CRAN review. 
+> [!CAUTION] This package is currently intended for INTERNAL use in thesis work at the University of Washington and has not been subject to CRAN review.
 
-### *Sweep_fun*
+```{r}
+devtools::install_github('nathanialaodell/skeetersweeper')
+library(skeetersweeper)
+```
+
+## *Sweep_fun*
 
 ---
 The primary tool contained in this package, 'sweep_fun', is a function that takes a raw, potentially messy .csv, .xlsx, or .xls file and both cleans and standardizes species collection and geospatial information.
@@ -28,9 +32,9 @@ The 'sweep' function can be split into a few sections and accomplishes multiple 
 
 **Thus, this function has the following limitations and assumptions (specifically with respect to the data input format)**.
 
-### Abundance information cleaning
-
+## Abundance information cleaning
 ---
+
 1)  The input data **must** have at least the following variables/column names (all other variables are ignored--for now, anyway):
 
 | Variable | Description |
@@ -51,7 +55,7 @@ The 'sweep' function can be split into a few sections and accomplishes multiple 
 
 3c) As a corollary to this: the 'sweep' function is just that--a function to perform the basic pre-processing needed to get your hands on somewhat-usable-not-totally-useless vector data. The 'mop' portion (work in progress)--which is intended to tackle the more complex and minute errors/issues--is a process that'll look different from dataset to dataset.
 
-### Pools information cleaning
+## Pools information cleaning
 
 ---
 The procedure is identical to the one described above except for the following changes to the required input data structure (marked in bold):
@@ -69,9 +73,9 @@ The procedure is identical to the one described above except for the following c
 | **disease** | **The disease being tested for.** |
 | **result** | **Result of test (1 if positive, else 0).** |
 
-### Examples
-
+## Examples
 ---
+
 ```{r}
 devtools::install_github('nathanialaodell/skeetersweeper')
 library(skeetersweeper)
@@ -108,3 +112,14 @@ here("interesting collections 2005-2008.xlsx")
 
 sweep_fun(extensions = skeeter.stack, state_name = "WY", type = "pool", sheets = TRUE)
 ```
+
+## *prism8_daily*
+
+------------------------------------------------------------------------
+
+> [!TIP] 
+> Even when only retaining .bil files, PRISM dailies can range from 50-100MB in size depending on the type of variable being extracted.
+
+Currently, the R 'prism' function does not have an option to download daily climate variables at 800m resolution. This function works around this by using command line operations within R to scrape their web service.
+
+Note that although download times for individual files is very short, this function forces a 2 second sleep between download requests to avoid overloading PRISM servers.
