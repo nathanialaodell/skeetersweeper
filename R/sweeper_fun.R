@@ -22,12 +22,15 @@ sweep_fun <- function(path = NULL,
                       extensions = NULL,
                       sheets = FALSE,
                       type = "abundance") {
+  if (is.null(path) &
+      is.null(extensions))
+    stop("No file type specifed ('path' and 'extensions' args cannot be simultaneously NULL).")
 
-  if (is.null(path) & is.null(extensions)) stop("No file type specifed ('path' and 'extensions' args cannot be simultaneously NULL).")
+  if (missing(state_name))
+    stop("No state provided! Please specify 'state_name' arg (e.g. 'TX'', 'WA', etc.)")
 
-  if(missing(state_name)) stop("No state provided! Please specify 'state_name' arg (e.g. 'TX'', 'WA', etc.)")
-
-  if(missing(type)) warning("'type' arg defaults to 'abundance'; ensure this is appropriate for your purposes!")
+  if (missing(type))
+    warning("'type' arg defaults to 'abundance'; ensure this is appropriate for your purposes!")
 
   message("Loading data...")
 
@@ -41,28 +44,28 @@ sweep_fun <- function(path = NULL,
 
   message("Data loaded successfully!")
 
-  std_fun <- switch( # praise stack overflow!
+  std_fun <- switch(
+    # praise stack overflow!
     type,
     abundance = standardize_output,
     pool = standardize_output_pools,
-    stop("Not a valid datasheet type! Must be either 'abundance' or 'pool'.")
+    stop(
+      "Not a valid datasheet type! Must be either 'abundance' or 'pool'."
+    )
   )
 
   message("Sweeping up. This may take a while...")
 
-  temp.list <- purrr::map(
-    temp.list,
-    function(df) {
-      df %>%
-        dplyr::mutate(state = state_name) %>%
-        standard_genus() %>%
-        parse_coords() %>%
-        geocode_missing_coords(state_name) %>%
-        propagate_coords() %>%
-        filter_females() %>%
-        std_fun()
-    }
-  )
+  temp.list <- purrr::map(temp.list, function(df) {
+    df %>%
+      dplyr::mutate(state = state_name) %>%
+      standard_genus() %>%
+      parse_coords() %>%
+      geocode_missing_coords(state_name) %>%
+      propagate_coords() %>%
+      filter_females() %>%
+      std_fun()
+  })
 
   message("Sweep complete! Binding data...")
 

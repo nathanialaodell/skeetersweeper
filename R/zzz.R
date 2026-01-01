@@ -2,10 +2,10 @@
 # LOAD IN DATA
 #-------------
 
-loader_fun <- function(path, extensions = NULL, sheets = FALSE){
-
-  if(sheets == TRUE){
-
+loader_fun <- function(path,
+                       extensions = NULL,
+                       sheets = FALSE) {
+  if (sheets == TRUE) {
     temp.list <- path %>%
       readxl::excel_sheets() %>%
       purrr::set_names() %>%
@@ -13,8 +13,7 @@ loader_fun <- function(path, extensions = NULL, sheets = FALSE){
 
   }
 
-  else if(!is.null(extensions)){
-
+  else if (!is.null(extensions)) {
     temp.list <- purrr::map(extensions, read.csv) # nicer syntax than base [[i]]
 
   }
@@ -31,7 +30,7 @@ loader_fun <- function(path, extensions = NULL, sheets = FALSE){
 # STANDARDIZE GENUS (two letter no period)
 #----------------------------------------
 
-standard_genus <- function(df){
+standard_genus <- function(df) {
   df$mosquito_id <- gsub("^Aedes ", "Ae ", df$mosquito_id)
   df$mosquito_id <- gsub("^Ae. ", "Ae ", df$mosquito_id)
   df$mosquito_id <- gsub("^Culex ", "Cx ", df$mosquito_id)
@@ -48,9 +47,8 @@ standard_genus <- function(df){
 # PARSE COORDS TO STANDARDIZE THEM
 #---------------------------------
 
-parse_coords <- function(df){
-
-  clean_dir <- function(z){
+parse_coords <- function(df) {
+  clean_dir <- function(z) {
     z %>%
       gsub("^[A-Z] ?", "", .) %>%
       gsub(" ?[A-Z]$", "", .)
@@ -75,13 +73,14 @@ parse_coords <- function(df){
 #--------------------------
 
 geocode_missing_coords <- function(df, state_name) {
-
   df$state <- state_name
 
   if (!("city" %in% names(df)) ||
       sum(is.na(df$latitude) | is.na(df$longitude)) == 0) {
     return(df)
-    warning("No city data present in provided datasheet. Missing coordinates will not be geocoded.")
+    warning(
+      "No city data present in provided datasheet. Missing coordinates will not be geocoded."
+    )
   }
 
   na_df <- df %>%
@@ -97,9 +96,11 @@ geocode_missing_coords <- function(df, state_name) {
   min <- postmastr::pm_house_parse(min)
 
   min <- postmastr::pm_streetDir_parse(min,
-                                       dictionary = postmastr::pm_dictionary(type = "directional",
-                                                                                  filter = c("N", "S", "E", "W"),
-                                                                                  locale = "us"))
+                                       dictionary = postmastr::pm_dictionary(
+                                         type = "directional",
+                                         filter = c("N", "S", "E", "W"),
+                                         locale = "us"
+                                       ))
 
   # error checking
   str(na_df$address)
@@ -119,7 +120,9 @@ geocode_missing_coords <- function(df, state_name) {
 
   parsed$pm.state <- state_name
 
-  parsed <- postmastr::pm_rebuild(parsed, output = "full", side = "right",
+  parsed <- postmastr::pm_rebuild(parsed,
+                                  output = "full",
+                                  side = "right",
                                   keep_parsed = "limited")
 
   geo.df <- tidygeocoder::geocode(
@@ -131,13 +134,8 @@ geocode_missing_coords <- function(df, state_name) {
     timeout = 20,
     method = 'census'
   ) %>%
-    dplyr::select(
-      address, lat, long
-    ) %>%
-    dplyr::rename(
-      latitude = "lat",
-      longitude = "long"
-    )
+    dplyr::select(address, lat, long) %>%
+    dplyr::rename(latitude = "lat", longitude = "long")
 
   df <- df %>%
     dplyr::mutate(address_clean = stringr::str_to_upper(stringr::str_trim(address))) %>%
@@ -146,16 +144,15 @@ geocode_missing_coords <- function(df, state_name) {
         dplyr::mutate(address_clean = stringr::str_to_upper(stringr::str_trim(address))) %>%
         dplyr::select(address_clean, geo_lat = latitude, geo_lon = longitude),
       by = "address_clean" ,
-      relationship = 'many-to-many') %>%
-    dplyr::mutate(latitude = ifelse(is.na(latitude),
-                                    geo_lat,
-                                    latitude),
-                  longitude = ifelse(is.na(longitude),
-                                     geo_lon,
-                                     longitude) ) %>%
+      relationship = 'many-to-many'
+    ) %>%
+    dplyr::mutate(
+      latitude = ifelse(is.na(latitude), geo_lat, latitude),
+      longitude = ifelse(is.na(longitude), geo_lon, longitude)
+    ) %>%
     dplyr::select(-address_clean, -geo_lat, -geo_lon)
 
-  df[!duplicated(df),]
+  df[!duplicated(df), ]
 }
 
 #------------------------------------------
@@ -163,8 +160,8 @@ geocode_missing_coords <- function(df, state_name) {
 #------------------------------------------
 
 filter_females <- function(df) {
-
-  if (!"sex" %in% names(df)) return(df)
+  if (!"sex" %in% names(df))
+    return(df)
 
   df$sex <- gsub("^Females.*", "Female", df$sex)
   df$sex <- gsub("^Female.*", "Female", df$sex)
@@ -172,9 +169,7 @@ filter_females <- function(df) {
   df$sex <- gsub("^f.*", "Female", df$sex)
 
   df <- df %>%
-    dplyr::filter(
-      sex == "Female"
-    ) %>%
+    dplyr::filter(sex == "Female") %>%
     dplyr::select(-sex)
 }
 
@@ -183,39 +178,46 @@ filter_females <- function(df) {
 #-------------------------------------
 
 standardize_output <- function(df) {
-
   df %>%
     dplyr::select(
-      county, sampled_date, address, collection_method,
-      latitude, longitude, mosquito_id,
-      number_of_mosquitoes, state
+      county,
+      sampled_date,
+      address,
+      collection_method,
+      latitude,
+      longitude,
+      mosquito_id,
+      number_of_mosquitoes,
+      state
     ) %>%
-    dplyr::mutate(
-      sampled_date = as.Date(sampled_date, "%m/%d/%y")
-    ) %>%
+    dplyr::mutate(sampled_date = as.Date(sampled_date, "%m/%d/%y")) %>%
     dplyr::rename(trapID = address,
                   species = mosquito_id,
                   total = number_of_mosquitoes)
 }
 
 standardize_output_pools <- function(df) {
-
   df %>%
     dplyr::select(
-      county, sampled_date, address, collection_method,
-      latitude, longitude, mosquito_id,
-      number_of_mosquitoes, state, disease, result
+      county,
+      sampled_date,
+      address,
+      collection_method,
+      latitude,
+      longitude,
+      mosquito_id,
+      number_of_mosquitoes,
+      state,
+      disease,
+      result
     ) %>%
     dplyr::mutate(
       sampled_date = as.Date(sampled_date, "%m/%d/%y"),
-      result = ifelse(
-        result %in% c("Positive", "Confirmed", 1), 1, 0
-      )
+      result = ifelse(result %in% c("Positive", "Confirmed", 1), 1, 0)
     ) %>%
     dplyr::rename(trapID = address,
                   species = mosquito_id,
-                  total = number_of_mosquitoes
-    )
+                  total = number_of_mosquitoes)
 }
 
 #--------------------------
@@ -223,15 +225,11 @@ standardize_output_pools <- function(df) {
 #--------------------------
 
 filter_outside_counties <- function(df, state_name) {
-
   county_shapes <- tigris::counties(state = state_name, cb = TRUE)
   valid_counties <- county_shapes$NAME
 
   for (county_name in unique(df$county)) {
-
-    bbox <- sf::st_bbox(
-      dplyr::filter(county_shapes, NAME == county_name)
-    )
+    bbox <- sf::st_bbox(dplyr::filter(county_shapes, NAME == county_name))
 
     idx <- df$county == county_name
 
@@ -256,12 +254,12 @@ propagate_coords <- function(df) {
   df %>%
     dplyr::group_by(address) %>%
     dplyr::mutate(
-      latitude = dplyr::coalesce(latitude,
-                                 ifelse(is.finite(max(latitude, na.rm = TRUE)),
-                                        max(latitude, na.rm = TRUE), NA_real_)),
-      longitude = dplyr::coalesce(longitude,
-                                  ifelse(is.finite(max(longitude, na.rm = TRUE)),
-                                         max(longitude, na.rm = TRUE), NA_real_))
+      latitude = dplyr::coalesce(latitude, ifelse(
+        is.finite(max(latitude, na.rm = TRUE)), max(latitude, na.rm = TRUE), NA_real_
+      )),
+      longitude = dplyr::coalesce(longitude, ifelse(
+        is.finite(max(longitude, na.rm = TRUE)), max(longitude, na.rm = TRUE), NA_real_
+      ))
     ) %>%
     ungroup()
 }

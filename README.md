@@ -117,8 +117,8 @@ sweep_fun(extensions = skeeter.stack, state_name = "WY", type = "pool", sheets =
 ------------------------------------------------------------------------
 
 > [!NOTE] 
-> Even when only retaining .bil files, PRISM dailies can range from 50-100MB in size depending on the type of variable being extracted.
+> .tif files created using this function range from ~500kb to 2mb per day, state, and variable.
 
 Currently, the R 'prism' package does not have an option to download daily climate variables at 800m resolution. This function works around this by using command line operations within R to scrape their web service.
 
-Note that although download times for individual files are very short, this function forces a 2 second sleep between download requests to avoid overloading PRISM servers.
+Note that although download times for individual files are very short, this function forces a 3.5 second sleep between download requests to avoid overloading PRISM servers.

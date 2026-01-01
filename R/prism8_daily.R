@@ -41,73 +41,79 @@
 #' @import terra
 #' @export
 
-prism8_daily <- function(var, start_date, end_date, date_list = NULL,
-                         dir = getwd(), remove = TRUE, bil = TRUE,
-                         template, state_name = NULL){
-
+prism8_daily <- function(var,
+                         start_date,
+                         end_date,
+                         date_list = NULL,
+                         dir = getwd(),
+                         remove = TRUE,
+                         bil = TRUE,
+                         template,
+                         state_name = NULL) {
   base_url <- "https://services.nacse.org/prism/data/get/us/800m"
   CRS = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"
 
-  for (v in var){
-
-
-  if (!is.null(date_list)){
-    dates <- date_list
-  }
-
-  else{dates <- seq(as.Date(start_date),
-               as.Date(end_date),
-               by = "1 day")
-  }
-
-  for (i in seq_along(dates)) {
-    day <- strftime(dates[i], "%Y%m%d")
-    url <- paste0(base_url, "/", v, "/", day, "?format=bil")
-
-    # Download file into temp folder
-    dest_file <- file.path(dir, paste0(v, "_", day, ".bil.zip"))
-    download.file(url, destfile = dest_file, mode = "wb")
-
-    ex_fl <- unzip(dest_file, exdir = dir)
-
-    irrelevant <- ex_fl[!grepl("\\.bil$|\\.hdr$", ex_fl)]
-
-    relevant <- ex_fl[grepl("\\.bil$|\\.hdr$", ex_fl)]
-
-    bil <- ex_fl[grepl("\\.bil$", ex_fl)]
-
-    file.remove(irrelevant)
-
-    if(remove){
-      file.remove(dest_file)
+  for (v in var) {
+    if (!is.null(date_list)) {
+      dates <- date_list
     }
 
-    if (!missing(template)){
+    else{
+      dates <- seq(as.Date(start_date), as.Date(end_date), by = "1 day")
+    }
 
-      dat <- terra::rast(bil)
-      terra::project(dat, CRS)
+    for (i in seq_along(dates)) {
+      # turning dates into readable strings to attach to the URL
+      day <- strftime(dates[i], "%Y%m%d")
+      url <- paste0(base_url, "/", v, "/", day, "?format=bil")
 
-      for (k in seq_along(template)){
+      # download file into specified folder
 
-        out <- terra::crop(
-          dat,
-          sf::st_transform(
-            template[[k]],
-            terra::crs(dat)
-          )
-        )
+      dest_file <- file.path(dir, paste0(v, "_", day, ".bil.zip"))
+      download.file(url, destfile = dest_file, mode = "wb")
 
-        terra::writeRaster(out, paste0(state_name[k], "_", v, "_", day, ".tif"))
+      ex_fl <- unzip(dest_file, exdir = dir)
+
+      # .bil and .hdr are needed to build rasters, nothing else. remove others ASAP
+
+      irrelevant <- ex_fl[!grepl("\\.bil$|\\.hdr$", ex_fl)]
+      file.remove(irrelevant)
+
+      relevant <- ex_fl[grepl("\\.bil$|\\.hdr$", ex_fl)]
+
+      # as in shapefiles in 'sf', only need to call in the .bil for rasters
+
+      bil <- ex_fl[grepl("\\.bil$", ex_fl)]
+
+
+      # remove .zip folder (default)
+      if (remove) {
+        file.remove(dest_file)
+      }
+
+      # some instances where having the entire US may be useful, so giving the option here
+      if (!missing(template)) {
+        # do this outside proceeding loop for speed
+        dat <- terra::rast(bil)
+        terra::project(dat, CRS)
+
+        # cropping the read raster to relevant bounding box(es)
+        for (k in seq_along(template)) {
+          out <- terra::crop(dat, sf::st_transform(template[[k]], terra::crs(dat)))
+
+          terra::writeRaster(out, paste0(state_name[k], "_", v, "_", day, ".tif"))
 
         }
 
       }
 
+      # remove everything that isn't a .tif prior to moving on to the next date
       file.remove(relevant)
     }
 
-    Sys.sleep(2)  # polite pause
+    # polite pause to not overload servers
+    Sys.sleep(3.5)
 
   }
 
-    }
+}
