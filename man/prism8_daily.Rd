@@ -2,7 +2,7 @@
 % Please edit documentation in R/prism8_daily.R
 \name{prism8_daily}
 \alias{prism8_daily}
-\title{Extract daily PRISM data at 800m resolution.}
+\title{Download and convert daily PRISM data at 800m resolution to .tif files.}
 \usage{
 prism8_daily(
   var,
@@ -11,7 +11,9 @@ prism8_daily(
   date_list = NULL,
   dir = getwd(),
   remove = TRUE,
-  bil = TRUE
+  bil = TRUE,
+  template,
+  state_name = NULL
 )
 }
 \arguments{
@@ -27,8 +29,40 @@ prism8_daily(
 
 \item{remove}{Logical. Removes zip files after extraction; HIGHLY recommended. Defaults to TRUE.}
 
-\item{bil}{Logical. Removes all extracted files that do not end in .bil; which is the minimum format needed for raster stacking. Defaults to TRUE.}
+\item{bil}{Logical. Removes all extracted files that do not end in .bil or .hdr; which are the minimum files needed to build a raster. Defaults to TRUE.}
+
+\item{template}{bbox. The extent(s) to which to crop downloaded data. See details}
+
+\item{state_name}{Character. If template is not missing, then the state(s) for which the bounding box is pulled from. Used for writing raster images.}
 }
 \description{
-Extract daily PRISM data at 800m resolution.
+Download and convert daily PRISM data at 800m resolution to .tif files.
+}
+\details{
+If you intend to extract climate data for multiple, but not all, states, specify the template arg as a list of bounding boxes.
+}
+\examples{
+
+box1 <- matrix(
+ c(-124.56624, 41.99179, -116.46350, 46.29083),
+ nrow = 1,
+ byrow = TRUE,
+ dimnames = list(NULL, c("xmin", "ymin", "xmax", "ymax"))
+)
+
+box2 <- matrix(
+ c(-106.64565, 25.83738, -93.50829, 36.50070),
+ nrow = 1,
+ byrow = TRUE,
+ dimnames = list(NULL, c("xmin", "ymin", "xmax", "ymax"))
+)
+
+boxes <- list(box1, box2)
+
+prism8_daily(var = c("ppt", "tmean", "tmin", "tmax"),
+start_date = "2025-12-25",
+end_date = "2025-12-26",
+template = boxes,
+state_name = c("OR", "TX"))
+
 }
