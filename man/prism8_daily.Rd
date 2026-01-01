@@ -4,16 +4,30 @@
 \alias{prism8_daily}
 \title{Extract daily PRISM data at 800m resolution.}
 \usage{
-prism8_daily(var, start_date, end_date, path = getwd())
+prism8_daily(
+  var,
+  start_date,
+  end_date,
+  date_list = NULL,
+  dir = getwd(),
+  remove = TRUE,
+  bil = TRUE
+)
 }
 \arguments{
-\item{var}{Character. The type of data you would like to download.  Must be "ppt", "tmean", "tmin", "tmax", "tdmean", "vpdmin", or "vpdmax".}
+\item{var}{Character, or list of character. The type of data you would like to download.  Must be "ppt", "tmean", "tmin", "tmax", "tdmean", "vpdmin", or "vpdmax".}
 
 \item{start_date}{Date. The first date in a range of days to download data for.}
 
 \item{end_date}{Date. The last date in a range of days to download data for.}
 
-\item{path}{Character. The location that data will be downloaded to. Defaults to working directory.}
+\item{date_list}{List of date. If you already know which dates you'd like to download data frame, use this to avoid downloading irrelevant data. Preferred method.}
+
+\item{dir}{Character. The location that data will be downloaded to. Defaults to working directory.}
+
+\item{remove}{Logical. Removes zip files after extraction; HIGHLY recommended. Defaults to TRUE.}
+
+\item{bil}{Logical. Removes all extracted files that do not end in .bil; which is the minimum format needed for raster stacking. Defaults to TRUE.}
 }
 \description{
 Extract daily PRISM data at 800m resolution.

@@ -5,13 +5,14 @@
 #' @param end_date Date. The last date in a range of days to download data for.
 #' @param dir Character. The location that data will be downloaded to. Defaults to working directory.
 #' @param remove Logical. Removes zip files after extraction; HIGHLY recommended. Defaults to TRUE.
-#' @param date_list List of date. If you already know which dates you'd like to download data frame, use this to avoid downloading irrelevant data. Prefered method.
+#' @param date_list List of date. If you already know which dates you'd like to download data frame, use this to avoid downloading irrelevant data. Preferred method.
+#' @param bil Logical. Removes all extracted files that do not end in .bil; which is the minimum format needed for raster stacking. Defaults to TRUE.
 #' @import lubridate
 #' @import janitor
 #' @export
 
 prism8_daily <- function(var, start_date, end_date, date_list = NULL,
-                         dir = getwd(), remove = TRUE){
+                         dir = getwd(), remove = TRUE, bil = TRUE){
 
   base_url <- "https://services.nacse.org/prism/data/get/us/800m"
 
@@ -35,7 +36,12 @@ prism8_daily <- function(var, start_date, end_date, date_list = NULL,
     dest_file <- file.path(dir, paste0(v, "_", day, ".bil.zip"))
     download.file(url, destfile = dest_file, mode = "wb")
 
-    unzip(dest_file, exdir = dir)
+    ex_fl <- unzip(dest_file, exdir = dir)
+
+    non_bil <- ex_fl[!grepl("\\.bil$", ex_fl)]
+
+    file.remove(non_bil)
+
     if(remove){
       file.remove(dest_file)
     }
