@@ -3,6 +3,9 @@
 > [!CAUTION] 
 > This package is currently intended for INTERNAL use in thesis work at the University of Washington and has not been subject to CRAN review.
 
+## Installation 
+
+---
 ```{r}
 devtools::install_github('nathanialaodell/skeetersweeper')
 library(skeetersweeper)
@@ -77,12 +80,7 @@ The procedure is identical to the one described above except for the following c
 ## Examples
 ---
 
-```{r}
-devtools::install_github('nathanialaodell/skeetersweeper')
-library(skeetersweeper)
-```
-
-'Toy data.csv' is available for extremely lightweight example purposes:
+'Toy data.csv' is available for extremely lightweight demonstration purposes:
 
 ```{r}
 data <- read.csv('https://raw.githubusercontent.com/nathanialaodell/skeetersweeper/refs/heads/main/Toy%20data.csv')
@@ -123,4 +121,4 @@ sweep_fun(extensions = skeeter.stack, state_name = "WY", type = "pool", sheets =
 
 Currently, the R 'prism' package does not have an option to download daily climate variables at 800m resolution. This function works around this by using command line operations within R to scrape their web service.
 
-Note that although download times for individual files is very short, this function forces a 2 second sleep between download requests to avoid overloading PRISM servers.
+Note that although download times for individual files are very short, this function forces a 2 second sleep between download requests to avoid overloading PRISM servers.
