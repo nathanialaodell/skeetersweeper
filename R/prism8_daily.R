@@ -35,21 +35,14 @@ prism8_daily <- function(var, start_date, end_date, date_list = NULL,
     dest_file <- file.path(dir, paste0(v, "_", day, ".bil.zip"))
     download.file(url, destfile = dest_file, mode = "wb")
 
-    Sys.sleep(2)  # polite pause
-  }
-
-  zip_files <- list.files(dir, pattern = "\\.zip$", full.names = TRUE)
-
-  for (z in zip_files) {
-    unzip(z, exdir = dir)
     unzip(dest_file, exdir = dir)
-
     if(remove){
       file.remove(dest_file)
     }
 
     Sys.sleep(2)  # polite pause
   }
-  }
 
-}
+    }
+
+  }
