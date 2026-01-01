@@ -9,6 +9,7 @@
 #' @param bil Logical. Removes all extracted files that do not end in .bil or .hdr; which are the minimum files needed to build a raster. Defaults to TRUE.
 #' @param template bbox. The extent(s) to which to crop downloaded data. Can be a list.
 #' @param state_name Character. If template is not missing, then the state(s) for which the bounding box is pulled from. Used for writing raster images.
+#' @param progress Logical. Whether to create a message in the console at the beginning of each file download initialization.
 #' @examples
 #'
 #' box1 <- matrix(
@@ -51,7 +52,8 @@ prism8_daily <- function(var,
                          remove = TRUE,
                          bil = TRUE,
                          template,
-                         state_name = NULL) {
+                         state_name = NULL,
+                         progress = TRUE) {
   base_url <- "https://services.nacse.org/prism/data/get/us/800m"
   CRS = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"
 
@@ -65,6 +67,11 @@ prism8_daily <- function(var,
     }
 
     for (i in seq_along(dates)) {
+
+      if(progress){
+        print(paste("File",i,"of",length(dates), sep = " "))
+      }
+
       # turning dates into readable strings to attach to the URL
       day <- strftime(dates[i], "%Y%m%d")
       url <- paste0(base_url, "/", v, "/", day, "?format=bil")
