@@ -31,7 +31,7 @@ prism8_daily(
 
 \item{bil}{Logical. Removes all extracted files that do not end in .bil or .hdr; which are the minimum files needed to build a raster. Defaults to TRUE.}
 
-\item{template}{bbox. The extent(s) to which to crop downloaded data. See details}
+\item{template}{bbox. The extent(s) to which to crop downloaded data. Can be a list.}
 
 \item{state_name}{Character. If template is not missing, then the state(s) for which the bounding box is pulled from. Used for writing raster images.}
 }
@@ -39,7 +39,8 @@ prism8_daily(
 Download and convert daily PRISM data at 800m resolution to .tif files.
 }
 \details{
-If you intend to extract climate data for multiple, but not all, states, specify the template arg as a list of bounding boxes.
+If using lists for template and state_name args, the elements must be aligned to avoid misnamed .tif files.
+E.g., if the first element of template is a bounding box for Wyoming then the first element of state_name must be "WY", and so on.
 }
 \examples{
 

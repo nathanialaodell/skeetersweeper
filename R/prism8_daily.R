@@ -7,7 +7,7 @@
 #' @param remove Logical. Removes zip files after extraction; HIGHLY recommended. Defaults to TRUE.
 #' @param date_list List of date. If you already know which dates you'd like to download data frame, use this to avoid downloading irrelevant data. Preferred method.
 #' @param bil Logical. Removes all extracted files that do not end in .bil or .hdr; which are the minimum files needed to build a raster. Defaults to TRUE.
-#' @param template bbox. The extent(s) to which to crop downloaded data. See details
+#' @param template bbox. The extent(s) to which to crop downloaded data. Can be a list.
 #' @param state_name Character. If template is not missing, then the state(s) for which the bounding box is pulled from. Used for writing raster images.
 #' @examples
 #'
@@ -34,7 +34,9 @@
 #' state_name = c("OR", "TX"))
 #'
 #' @details
-#' If you intend to extract climate data for multiple, but not all, states, specify the template arg as a list of bounding boxes.
+#' If using lists for template and state_name args, the elements must be aligned to avoid misnamed .tif files.
+#' E.g., if the first element of template is a bounding box for Wyoming then the first element of state_name must be "WY", and so on.
+#'
 #'
 #' @import lubridate
 #' @import janitor
