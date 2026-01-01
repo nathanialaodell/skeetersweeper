@@ -1,16 +1,12 @@
-# skeetersweep
+# skeetersweeper
 
 > [!CAUTION]
 > This package is currently intended for INTERNAL use in thesis work at the University of Washington and has not been subject to CRAN review. 
 
-### Preamble
-
-This (work in progress) repo will include function(s) needed to clean state-specific vector control data. 
-
-### Sweep_fun
+### *Sweep_fun*
 
 ---
-The 'sweep' function is a function that takes a raw, potentially messy .csv, .xlsx, or .xls file and both cleans and standardizes species collection and geospatial information.
+The primary tool contained in this package, 'sweep_fun', is a function that takes a raw, potentially messy .csv, .xlsx, or .xls file and both cleans and standardizes species collection and geospatial information.
 
 The following table describes the function's arguments.
 
