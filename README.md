@@ -1,7 +1,7 @@
 # skeetersweeper
 
 > [!CAUTION] 
-> This package is currently intended for INTERNAL use in thesis work at the University of Washington and has not been subject to CRAN review.
+> This package is a work in progress, currently intended for INTERNAL use in thesis work at the University of Washington and has not been subject to CRAN review.
 
 ## Installation 
 
