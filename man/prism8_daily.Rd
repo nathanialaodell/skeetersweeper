@@ -42,11 +42,12 @@ prism8_daily(
 Download and convert daily PRISM data at 800m resolution to .tif files.
 }
 \details{
-If using lists for template and state_name args, the elements must be aligned to avoid misnamed .tif files.
+Create a .tif for the entire United States is the default functionality. If using lists for template and state_name args, the elements must be aligned to avoid misnamed .tif files.
 E.g., if the first element of template is a bounding box for Wyoming then the first element of state_name must be "WY", and so on.
 }
 \examples{
 
+# downloading precipitation, temp mean, min, and max data for Texas and Oregon
 box1 <- matrix(
  c(-124.56624, 41.99179, -116.46350, 46.29083),
  nrow = 1,

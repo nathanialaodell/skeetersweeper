@@ -153,6 +153,20 @@ overloading PRISM servers.
 ## Examples
 ---
 
+Downloading precipitation, temp mean, min, and max data for the entire 
+United States; this is the default functionality: 
+
+```{r}
+prism8_daily(var = c("ppt", "tmean", "tmin", "tmax"),
+start_date = "2025-12-25",
+end_date = "2025-12-26",
+template = boxes,
+state_name = c("OR", "TX")
+)
+```
+
+Downloading precipitation, temp mean, min, and max data for Texas and Oregon: 
+
 ```{r}
  box1 <- matrix(
   c(-124.56624, 41.99179, -116.46350, 46.29083),
