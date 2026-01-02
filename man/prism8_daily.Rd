@@ -13,7 +13,8 @@ prism8_daily(
   remove = TRUE,
   bil = TRUE,
   template,
-  state_name = NULL
+  state_name = NULL,
+  progress = TRUE
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ prism8_daily(
 \item{template}{bbox. The extent(s) to which to crop downloaded data. Can be a list.}
 
 \item{state_name}{Character. If template is not missing, then the state(s) for which the bounding box is pulled from. Used for writing raster images.}
+
+\item{progress}{Logical. Whether to create a message in the console at the beginning of each file download initialization.}
 }
 \description{
 Download and convert daily PRISM data at 800m resolution to .tif files.
@@ -64,6 +67,14 @@ prism8_daily(var = c("ppt", "tmean", "tmin", "tmax"),
 start_date = "2025-12-25",
 end_date = "2025-12-26",
 template = boxes,
-state_name = c("OR", "TX"))
+state_name = c("OR", "TX")
+)
+
+# alternatively, do not crop data
+prism8_daily(var = c("ppt", "tmean", "tmin", "tmax"),
+start_date = "2025-12-25",
+end_date = "2025-12-26"
+)
+
 
 }

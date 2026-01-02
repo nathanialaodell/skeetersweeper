@@ -32,7 +32,15 @@
 #' start_date = "2025-12-25",
 #' end_date = "2025-12-26",
 #' template = boxes,
-#' state_name = c("OR", "TX"))
+#' state_name = c("OR", "TX")
+#' )
+#'
+#' # alternatively, do not crop data
+#' prism8_daily(var = c("ppt", "tmean", "tmin", "tmax"),
+#' start_date = "2025-12-25",
+#' end_date = "2025-12-26"
+#' )
+#'
 #'
 #' @details
 #' If using lists for template and state_name args, the elements must be aligned to avoid misnamed .tif files.
@@ -82,6 +90,11 @@ prism8_daily <- function(var,
 
       ex_fl <- unzip(dest_file, exdir = dir)
 
+      # remove .zip folder (default)
+      if (remove) {
+        file.remove(dest_file)
+      }
+
       # .bil and .hdr are needed to build rasters, nothing else. remove others ASAP
 
       irrelevant <- ex_fl[!grepl("\\.bil$|\\.hdr$", ex_fl)]
@@ -94,12 +107,6 @@ prism8_daily <- function(var,
       bil <- ex_fl[grepl("\\.bil$", ex_fl)]
       dat <- terra::rast(bil)
       dat <- terra::project(dat, CRS)
-
-
-      # remove .zip folder (default)
-      if (remove) {
-        file.remove(dest_file)
-      }
 
       # some instances where having the entire US may be useful, so giving the option here
       if (!missing(template)) {
@@ -130,7 +137,7 @@ prism8_daily <- function(var,
         file.remove(relevant)
 
         # polite pause to not overload servers
-        Sys.sleep(3.5)
+        Sys.sleep(2)
     }
 
   }

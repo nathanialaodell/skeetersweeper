@@ -14,7 +14,9 @@ library(skeetersweeper)
 ## *Sweep_fun*
 
 ---
-The primary tool contained in this package, 'sweep_fun', is a function that takes a raw, potentially messy .csv, .xlsx, or .xls file and both cleans and standardizes species collection and geospatial information.
+The primary tool contained in this package, 'sweep_fun', is a function that 
+takes a raw, potentially messy .csv, .xlsx, or .xls file and both cleans and 
+standardizes species collection and geospatial information.
 
 The following table describes the function's arguments.
 
@@ -117,8 +119,33 @@ sweep_fun(extensions = skeeter.stack, state_name = "WY", type = "pool", sheets =
 ------------------------------------------------------------------------
 
 > [!NOTE] 
-> .tif files created using this function range from ~500kb to 2mb per day, state, and variable.
+> This function only has the functionality to extract data from the United States.
 
-Currently, the R 'prism' package does not have an option to download daily climate variables at 800m resolution. This function works around this by using command line operations within R to scrape their web service.
+Currently, the R 'prism' package does not have an option to download daily 
+climate variables at 800m resolution. This function works around this by using 
+command line operations within R to scrape their web service.
 
-Note that although download times for individual files are very short, this function forces a 3.5 second sleep between download requests to avoid overloading PRISM servers.
+First, the user specifies which variables they want to download from the 
+PRISM webservice, the date range, and whether or not they want to crop these 
+climate variables to a spacial extent (such as state boundaries). 
+The workflow is as follows for index i in a provided date range:
+
+1) Download the file to the user-specified path by pasting the date into a base URL
+2) Unzip the file and remove all files without a .bil or .hdr extension. Optionally, delete the .zip after extraction
+3) Temporarily load the .bil into R as a raster file
+4) If applicable, crop the raster to a spacial extent
+5) Save the raster as a .tif (this is saved in the same path as step 1)
+6) Remove all .bil and .hdr files in the directory before moving onto i + 1
+
+Steps 4-6 are intended to limit the amount of storage required to store United 
+PRISM climate data. If you were attempt to download all required data, unzip it, 
+and leave it as a .bil/.hdr combination, the amount of space required per day 
+can range from 50-100mb per daily. If, for example, you wanted to download data 
+for precipitation, temp max, min, and mean, you would need anywhere between 
+1-5TB of storage, depending on the date range. Converting to a .tif condenses 
+data into 500kb-5mb chunks, with the higher end being for uncropped data 
+(i.e., a daily for the entire United States).
+
+Note that although download times for individual files are very short, as per the PRISM group's request
+this function forces a 2 second sleep between download requests to avoid 
+overloading PRISM servers.
