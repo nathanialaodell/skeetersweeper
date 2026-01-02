@@ -106,39 +106,49 @@ prism8_daily <- function(var,
       # as in shapefiles in 'sf', only need to call in the .bil for rasters
 
       bil <- ex_fl[grepl("\\.bil$", ex_fl)]
+
       dat <- terra::rast(bil)
-      dat <- terra::project(dat, CRS)
 
       # some instances where having the entire US may be useful, so giving the option here
       if (!missing(template)) {
-
         # cropping the read raster to relevant bounding boxes if multiple
 
         if (is.list(template)) {
           for (k in seq_along(template)) {
             out <- terra::crop(dat, sf::st_transform(template[[k]], terra::crs(dat)))
+            out <- terra::project(out, CRS)
 
-            terra::writeRaster(out, paste0(dir,"/",state_name[k], "_", v, "_", day, ".tif"))
+            terra::writeRaster(out,
+                               paste0(dir, "/", state_name[k], "_", v, "_", day, ".tif"))
           }
         }
 
         else {
           out <- terra::crop(dat, sf::st_transform(template, terra::crs(dat)))
+          out <- terra::project(out, CRS)
 
-          terra::writeRaster(out, paste0(dir,"/",state_name, "_", v, "_", day, ".tif"))
+          terra::writeRaster(out,
+                             paste0(dir, "/", state_name, "_", v, "_", day, ".tif"))
         }
 
       }
 
       else {
-        terra::writeRaster(dat, paste0(dir,"/US_", v, "_", day, ".tif"))
+        terra::writeRaster(dat, paste0(dir, "/US_", v, "_", day, ".tif"))
       }
 
-        # remove everything that isn't a .tif prior to moving on to the next date
-        file.remove(relevant)
+      # remove everything that isn't a .tif prior to moving on to the next date
+      file.remove(relevant)
 
-        # polite pause to not overload servers
-        Sys.sleep(2)
+      # terra will create temp files that won't be removed until the R session ends
+      terra::tmpFiles(remove = TRUE)
+
+      # polite pause to not overload servers
+      Sys.sleep(2)
+
+      if (i %% 5 == 0) {
+        gc()
+      }
     }
 
   }
