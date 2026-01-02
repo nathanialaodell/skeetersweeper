@@ -121,10 +121,15 @@ prism8_daily <- function(var,
           terra::writeRaster(out, paste0(dir,"/",state_name, "_", v, "_", day, ".tif"))
         }
 
+      }
+
+      else {
+        terra::writeRaster(dat, paste0(dir,"/US_", v, "_", day, ".tif"))
+      }
+
         # remove everything that isn't a .tif prior to moving on to the next date
         file.remove(relevant)
 
-      }
 
     }
 
