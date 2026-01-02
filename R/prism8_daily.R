@@ -92,6 +92,8 @@ prism8_daily <- function(var,
       # as in shapefiles in 'sf', only need to call in the .bil for rasters
 
       bil <- ex_fl[grepl("\\.bil$", ex_fl)]
+      dat <- terra::rast(bil)
+      dat <- terra::project(dat, CRS)
 
 
       # remove .zip folder (default)
@@ -101,9 +103,6 @@ prism8_daily <- function(var,
 
       # some instances where having the entire US may be useful, so giving the option here
       if (!missing(template)) {
-        # do this outside proceeding loop for speed
-        dat <- terra::rast(bil)
-        terra::project(dat, CRS)
 
         # cropping the read raster to relevant bounding boxes if multiple
 
@@ -130,12 +129,10 @@ prism8_daily <- function(var,
         # remove everything that isn't a .tif prior to moving on to the next date
         file.remove(relevant)
 
-
+        # polite pause to not overload servers
+        Sys.sleep(3.5)
     }
 
   }
-
-  # polite pause to not overload servers
-  Sys.sleep(3.5)
 
 }
