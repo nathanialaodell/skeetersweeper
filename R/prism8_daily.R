@@ -111,14 +111,14 @@ prism8_daily <- function(var,
           for (k in seq_along(template)) {
             out <- terra::crop(dat, sf::st_transform(template[[k]], terra::crs(dat)))
 
-            terra::writeRaster(out, paste0(state_name[k], "_", v, "_", day, ".tif"))
+            terra::writeRaster(out, paste0(dir,"/",state_name[k], "_", v, "_", day, ".tif"))
           }
         }
 
         else {
           out <- terra::crop(dat, sf::st_transform(template, terra::crs(dat)))
 
-          terra::writeRaster(out, paste0(state_name, "_", v, "_", day, ".tif"))
+          terra::writeRaster(out, paste0(dir,"/",state_name, "_", v, "_", day, ".tif"))
         }
 
         # remove everything that isn't a .tif prior to moving on to the next date
