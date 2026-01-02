@@ -28,7 +28,7 @@ The following table describes the function's arguments.
 
 The 'sweep' function can be split into a few sections and accomplishes multiple pre-processing tasks that don't require manual oversight:
 
-1)  Standardizing the genus representation for *Aedes* (Ae), *Culex* (Cu), *Anopheles* (An), and *Psorophora* (P); ensuring that different agency standards for species ID'ing inputs don't impact statistical analyses.
+1)  Standardizing the genus representation for *Aedes* (Ae), *Culex* (Cx), *Anopheles* (An), and *Psorophora* (P); ensuring that different agency standards for species ID'ing inputs don't impact statistical analyses.
 2)  For agencies that record street addresses of trap locations (as opposed to giving traps unique identifiers), address representation is standardized to *HOUSE NUMBER* *STREET NAME* *STREET SUFFIX*
 3) Parse geoocoordinates to ensure they are in degree decimal format (via 'parzer')
 4) Geocode addresses with missing or obviously incorrect geocoordinates (outside of the county's bounding box via 'tigris'--an imperfect but reasonable solution). Observations are removed if geocode result is empty.
