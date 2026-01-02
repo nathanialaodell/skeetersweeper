@@ -153,7 +153,7 @@ overloading PRISM servers.
 ## Examples
 ---
 
-Downloading precipitation, temp mean, min, and max data for the entire 
+Creating a .tif for precipitation, temp mean, min, and max data for the entire 
 United States; this is the default functionality: 
 
 ```{r}
@@ -163,7 +163,7 @@ end_date = "2025-12-26"
 )
 ```
 
-Downloading precipitation, temp mean, min, and max data for Texas and Oregon: 
+Creating a .tif for precipitation, temp mean, min, and max data for Texas and Oregon: 
 
 ```{r}
  box1 <- matrix(
