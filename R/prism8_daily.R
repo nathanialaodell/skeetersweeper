@@ -67,9 +67,8 @@ prism8_daily <- function(var,
     }
 
     for (i in seq_along(dates)) {
-
-      if(progress){
-        print(paste("File",i,"of",length(dates), sep = " "))
+      if (progress) {
+        print(paste("File", i, "of", length(dates), sep = " "))
       }
 
       # turning dates into readable strings to attach to the URL
@@ -106,23 +105,32 @@ prism8_daily <- function(var,
         dat <- terra::rast(bil)
         terra::project(dat, CRS)
 
-        # cropping the read raster to relevant bounding box(es)
-        for (k in seq_along(template)) {
-          out <- terra::crop(dat, sf::st_transform(template[[k]], terra::crs(dat)))
+        # cropping the read raster to relevant bounding boxes if multiple
 
-          terra::writeRaster(out, paste0(state_name[k], "_", v, "_", day, ".tif"))
+        if (is.list(template)) {
+          for (k in seq_along(template)) {
+            out <- terra::crop(dat, sf::st_transform(template[[k]], terra::crs(dat)))
 
+            terra::writeRaster(out, paste0(state_name[k], "_", v, "_", day, ".tif"))
+          }
         }
+
+        else {
+          out <- terra::crop(dat, sf::st_transform(template, terra::crs(dat)))
+
+          terra::writeRaster(out, paste0(state_name, "_", v, "_", day, ".tif"))
+        }
+
+        # remove everything that isn't a .tif prior to moving on to the next date
+        file.remove(relevant)
 
       }
 
-      # remove everything that isn't a .tif prior to moving on to the next date
-      file.remove(relevant)
     }
 
-    # polite pause to not overload servers
-    Sys.sleep(3.5)
-
   }
+
+  # polite pause to not overload servers
+  Sys.sleep(3.5)
 
 }
