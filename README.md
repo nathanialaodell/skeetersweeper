@@ -159,9 +159,7 @@ United States; this is the default functionality:
 ```{r}
 prism8_daily(var = c("ppt", "tmean", "tmin", "tmax"),
 start_date = "2025-12-25",
-end_date = "2025-12-26",
-template = boxes,
-state_name = c("OR", "TX")
+end_date = "2025-12-26"
 )
 ```
 
