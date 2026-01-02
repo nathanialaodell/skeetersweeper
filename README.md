@@ -128,16 +128,16 @@ command line operations within R to scrape their web service.
 First, the user specifies which variables they want to download from the 
 PRISM webservice, the date range, and whether or not they want to crop these 
 climate variables to a spacial extent (such as state boundaries). 
-The workflow is as follows for index i in a provided date range:
+The workflow is as follows for index $i$ in a provided date range:
 
 1) Download the file to the user-specified path by pasting the date into a base URL
 2) Unzip the file and remove all files without a .bil or .hdr extension. Optionally, delete the .zip after extraction
 3) Temporarily load the .bil into R as a raster file
 4) If applicable, crop the raster to a spacial extent
 5) Save the raster as a .tif (this is saved in the same path as step 1)
-6) Remove all .bil and .hdr files in the directory before moving onto i + 1
+6) Remove all .bil and .hdr files in the directory before moving onto $i+1$
 
-Steps 4-6 are intended to limit the amount of storage required to store United 
+Steps 4-6 are intended to limit the amount of storage required to store 
 PRISM climate data. If you were attempt to download all required data, unzip it, 
 and leave it as a .bil/.hdr combination, the amount of space required per day 
 can range from 50-100mb per daily. If, for example, you wanted to download data 
@@ -149,3 +149,31 @@ data into 500kb-5mb chunks, with the higher end being for uncropped data
 Note that although download times for individual files are very short, as per the PRISM group's request
 this function forces a 2 second sleep between download requests to avoid 
 overloading PRISM servers.
+
+## Examples
+---
+
+```{r}
+ box1 <- matrix(
+  c(-124.56624, 41.99179, -116.46350, 46.29083),
+  nrow = 1,
+  byrow = TRUE,
+  dimnames = list(NULL, c("xmin", "ymin", "xmax", "ymax"))
+ )
+
+ box2 <- matrix(
+  c(-106.64565, 25.83738, -93.50829, 36.50070),
+  nrow = 1,
+  byrow = TRUE,
+  dimnames = list(NULL, c("xmin", "ymin", "xmax", "ymax"))
+ )
+
+ boxes <- list(box1, box2)
+
+prism8_daily(var = c("ppt", "tmean", "tmin", "tmax"),
+start_date = "2025-12-25",
+end_date = "2025-12-26",
+template = boxes,
+state_name = c("OR", "TX")
+)
+```
