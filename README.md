@@ -57,9 +57,9 @@ The 'sweep' function can be split into a few sections and accomplishes multiple 
 2)  It is assumed that the 'tigris' package has the most up-to-date and correct county boundaries as per its counties() function call. Tigris uses the Census line files to draw these county boundaries.
 3)  Some trap locations/geocoordinates may simply be impossible to decipher/clean using the combination of 'parzer', 'tigris', and 'postmastr' leveraged in this function. This can cause issues in geospatial analysis if not caught.
 
-3b) **It is imperative that all data cleaned using this function is turned into a shapefile and plotted prior to analysis to ensure that there are no error in spatial coordinates**.
+    3b. **It is imperative that all data cleaned using this function is turned into a shapefile and plotted prior to analysis to ensure that there are no error in spatial coordinates**.
 
-3c) As a corollary to this: the 'sweep' function is just that--a function to perform the basic pre-processing needed to get your hands on somewhat-usable-not-totally-useless vector data. The 'mop' portion (work in progress)--which is intended to tackle the more complex and minute errors/issues--is a process that'll look different from dataset to dataset.
+    3c. As a corollary to this: the 'sweep' function is just that--a function to perform the basic pre-processing needed to get your hands on somewhat-usable-not-totally-useless vector data.
 
 ## Pools information cleaning
 
