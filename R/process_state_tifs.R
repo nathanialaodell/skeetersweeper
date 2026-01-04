@@ -17,7 +17,7 @@ process_state_tifs <- function(state_name,
                                mask,
                                remove = FALSE,
                                return = TRUE) {
-  tif_files <- list.files(clim_path, pattern = paste0("^", state_name)) # MAKE THIS USEABLE FOR OTHER VARIABLES SOON!
+  tif_files <- list.files(clim_path, pattern = paste0("^", state_name, "_\\w{2,6}_\\d{8}.+"))
 
   # create raster stacks
   state_stack <- terra::rast(paste0(clim_path, tif_files))
@@ -30,7 +30,7 @@ process_state_tifs <- function(state_name,
 
   if(write)
     # write the main stack
-    terra::writeRaster(state_stack, save_path, overwrite = TRUE)
+    terra::writeRaster(state_stack, save_path, overwrite = FALSE)
 
   # remove original files
   if (remove) {
