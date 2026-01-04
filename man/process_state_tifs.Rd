@@ -17,7 +17,7 @@ process_state_tifs(
 \arguments{
 \item{state_name}{Character. State abbreviation as it appears in your file directory.}
 
-\item{write}{Logical. Whether to write the the raster stack as an .RDS file.}
+\item{write}{Logical. Whether to write the the raster stack as a tif file.}
 
 \item{clim_path}{Character. The path of your .tif data.}
 

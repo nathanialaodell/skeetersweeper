@@ -1,7 +1,7 @@
 #' Stack and save downloaded state climate data
 #'
 #' @param state_name Character. State abbreviation as it appears in your file directory.
-#' @param write Logical. Whether to write the the raster stack as an .RDS file.
+#' @param write Logical. Whether to write the the raster stack as a tif file.
 #' @param clim_path Character. The path of your .tif data.
 #' @param save_path Character. If writing, where to save to.
 #' @param mask sf. Converted to SpatVector prior to mask the raster stack.
@@ -30,7 +30,7 @@ process_state_tifs <- function(state_name,
 
   if(write)
     # write the main stack
-    readr::write_rds(x = state_stack, file = save_path)
+    terra::writeRaster(state_stack, save_path, overwrite = TRUE)
 
   # remove original files
   if (remove) {
