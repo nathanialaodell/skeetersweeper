@@ -85,8 +85,8 @@ prism8_daily <- function(var,
           all_exist <- all(sapply(state_name, function(sn) {
             file.exists(file.path(dir, paste0(sn, "_", v, "_", day, ".tif")))
           }))
-          if (all_exist)
-            print(paste("Skipping", day, ": .tif already in directory!", sep = " ")) {
+          if (all_exist) {
+            print(paste0("Skipping ", as.Date(day, format = "%Y%m%d"), ": .tif already in directory!"))
               next
             }
         } else {
@@ -94,14 +94,14 @@ prism8_daily <- function(var,
           if (file.exists(file.path(dir, paste0(
             state_name, "_", v, "_", day, ".tif"
           )))) {
-            print(paste("Skipping", day, ": .tif already in directory!", sep = " "))
+            print(paste0("Skipping ", as.Date(day, format = "%Y%m%d"), ": .tif already in directory!"))
             next
           }
         }
       } else {
         # check if US .tif file exists
         if (file.exists(file.path(dir, paste0("US_", v, "_", day, ".tif")))) {
-          print(paste("Skipping", day, ": .tif already in directory!", sep = " "))
+          print(paste0("Skipping ", as.Date(day, format = "%Y%m%d"), ": .tif already in directory!"))
           next
         }
       }
@@ -181,5 +181,4 @@ prism8_daily <- function(var,
     }
 
   }
-
 }
