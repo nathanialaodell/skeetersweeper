@@ -190,15 +190,15 @@ standardize_output <- function(df) {
       number_of_mosquitoes,
       state
     ) %>%
-    dplyr::mutate(county = as.character(),
+    dplyr::mutate(county = as.character(county),
                   sampled_date = as.Date(sampled_date, "%m/%d/%y"),
-                  address = as.character(),
-                  collection_method = as.character(),
-                  latitude = as.numeric(),
-                  longitude = as.numeric(),
-                  mosquito_id = as.character(),
-                  number_of_mosquitoes = as.numeric(),
-                  state = as.character()) %>%
+                  address = as.character(address),
+                  collection_method = as.character(collection_method),
+                  latitude = as.numeric(latitude),
+                  longitude = as.numeric(longitude),
+                  mosquito_id = as.character(mosquito_id),
+                  number_of_mosquitoes = as.numeric(number_of_mosquitoes),
+                  state = as.character(state)) %>%
     dplyr::rename(trapID = address,
                   species = mosquito_id,
                   total = number_of_mosquitoes)
@@ -220,17 +220,17 @@ standardize_output_pools <- function(df) {
       result
     ) %>%
     dplyr::mutate(
-      county = as.character(),
+      county = as.character(county),
       sampled_date = as.Date(sampled_date, "%m/%d/%y"),
       result = ifelse(result %in% c("Positive", "Confirmed", 1), 1, 0),
-      disease = as.character(),
-      address = as.character(),
-      collection_method = as.character(),
-      latitude = as.numeric(),
-      longitude = as.numeric(),
-      mosquito_id = as.character(),
-      number_of_mosquitoes = as.numeric(),
-      state = as.character()
+      disease = as.character(disease),
+      address = as.character(address),
+      collection_method = as.character(collection_method),
+      latitude = as.numeric(latitude),
+      longitude = as.numeric(longitude),
+      mosquito_id = as.character(mosquito_id),
+      number_of_mosquitoes = as.numeric(number_of_mosquitoes),
+      state = as.character(state)
     ) %>%
     dplyr::rename(trapID = address,
                   species = mosquito_id,
