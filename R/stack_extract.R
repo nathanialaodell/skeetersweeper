@@ -39,7 +39,7 @@ stack_extract <- function(dat,
     state_stack <- state_stack[[matching_layers]]
 
     message(paste("Extracting", length(matching_layers), "of",
-                  terra::nlyr(original_length), "possible layers due to dates argument."))
+                  length(original_length), "possible layers due to dates argument."))
   }
 
   dat_sf <- dat %>% sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326) %>%
