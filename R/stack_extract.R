@@ -3,63 +3,48 @@
 #' @param dat Data frame. Must contain longitude and latitude columns.
 #' @param state_stack Raster stack containing climate data for a state.
 #' @param var Character. One of "tmean", "ppt", "tmin", "tmax", "vpdmax", or "tdmean" (variables extractable in prism8_daily).
-#' @param lon_ol Character.
-#' @param lat_col Character.
-#' @param crs_in Numeric. The coordinate reference system to apply to dat.
-#'
+
 #' @export
 
 # tif extraction helper
 stack_extract <- function(dat,
                           state_stack,
-                          var = c("tmean", "ppt", "tmin", "tmax", "vpdmax", "vpdmin", "tdmean"),
-                          lon_col = "longitude",
-                          lat_col = "latitude",
-                          crs_in = 4326) {
-  var <- match.arg(var)
+                          var = c("tmean", "ppt", "tmin", "tmax", "vpdmax", "vpdmin", "tdmean")
+                          ) {
 
-  # get unique coordinates and preserve mapping to original rows
-  dat_unique <- dat %>%
-    mutate(original_id = row_number()) %>%
-    group_by(across(all_of(c(lon_col, lat_col)))) %>%
-    summarise(original_ids = list(original_id), .groups = "drop")
+  dat_sf <- dat %>% sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326) %>%
+    dplyr::group_by(geometry) %>%
+    dplyr::summarise(dum = sum(total), .groups = "drop")
 
-  # convert unique coords to sf
-  dat_sf <- dat_unique %>%
-    st_as_sf(coords = c(lon_col, lat_col), crs = crs_in) %>%
-    st_transform(crs(state_stack))
+  # when transforming to the different CRS, there is a slight shift in coordinates. Add them back
+  orig_coords <- dat_sf %>%
+    dplyr::mutate(
+      longitude = sf::st_coordinates(.)[, 1],
+      latitude = sf::st_coordinates(.)[, 2]
+    ) %>%
+    sf::st_drop_geometry()
 
-  # extract values; no repetition here!
-  extracted_points <- terra::extract(state_stack, terra::vect(dat_sf), xy = TRUE)
-
+  dat_sf <- sf::st_transform(dat_sf, terra::crs(state_stack))
   var_pattern <- paste0("prism_", var, "_")
 
-  # pivot and clean column names
-  extracted_long <- extracted_points %>%
-    pivot_longer(
-      cols = starts_with(var_pattern),
+  # testing extraction speed
+  extracted_points <- terra::extract(state_stack, terra::vect(dat_sf), xy = F)
+
+  extracted_points <- cbind(extracted_points, orig_coords)
+
+  extracted_points <- extracted_points %>% # the method detailed in my PRISM write up is outdated... remaking this
+    tidyr::pivot_longer(
+      cols = tidyselect::starts_with(var_pattern),
       names_to = "date_string",
-      values_to = "value"
+      values_to = var
     ) %>%
-    mutate(
-      date_string = str_replace(date_string, paste0(var_pattern, "us_30s_"), ""),
+    # extract the date from the column name
+    dplyr::mutate(
+      # remove the prefix to get just the date portion (YYYYMMDD)
+      date_string = stringr::str_replace(date_string, paste0(var_pattern, "us_30s_"), ""),
+      # convert to proper date format
       date = as.Date(date_string, format = "%Y%m%d")
     ) %>%
-    select(ID, date, x, y, value) %>%
-    rename(!!var := value)
-
-  # add back the original IDs mapping
-  extracted_long <- extracted_long %>%
-    left_join(
-      dat_sf %>%
-        st_drop_geometry() %>%
-        mutate(ID = row_number()) %>%
-        select(ID, original_ids),
-      by = "ID"
-    ) %>%
-    unnest(original_ids) %>%
-    select(-ID) %>%
-    rename(ID = original_ids)
-
-  return(extracted_long)
+    # remove the intermediate date_string column and reorder
+    dplyr::select(date, longitude, latitude, var)
 }

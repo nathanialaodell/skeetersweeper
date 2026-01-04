@@ -7,10 +7,7 @@
 stack_extract(
   dat,
   state_stack,
-  var = c("tmean", "ppt", "tmin", "tmax", "vpdmax", "vpdmin", "tdmean"),
-  lon_col = "longitude",
-  lat_col = "latitude",
-  crs_in = 4326
+  var = c("tmean", "ppt", "tmin", "tmax", "vpdmax", "vpdmin", "tdmean")
 )
 }
 \arguments{
@@ -19,12 +16,6 @@ stack_extract(
 \item{state_stack}{Raster stack containing climate data for a state.}
 
 \item{var}{Character. One of "tmean", "ppt", "tmin", "tmax", "vpdmax", or "tdmean" (variables extractable in prism8_daily).}
-
-\item{lat_col}{Character.}
-
-\item{crs_in}{Numeric. The coordinate reference system to apply to dat.}
-
-\item{lon_ol}{Character.}
 }
 \description{
 Extract .tif data to trap points
