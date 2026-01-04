@@ -15,7 +15,7 @@ stack_extract <- function(dat,
                           ) {
 
   if (!is.null(dates)) {
-    orginal_length <- terra::nlyr(state_stack)
+    original_length <- terra::nlyr(state_stack)
 
     # create pattern for the variable
     var_pattern <- paste0("prism_", var, "_")
@@ -39,7 +39,7 @@ stack_extract <- function(dat,
     state_stack <- state_stack[[matching_layers]]
 
     message(paste("Extracting", length(matching_layers), "of",
-                  terra::nlyr(state_stack), "layers"))
+                  terra::nlyr(original_length), "possible layers due to dates argument."))
   }
 
   dat_sf <- dat %>% sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326) %>%
