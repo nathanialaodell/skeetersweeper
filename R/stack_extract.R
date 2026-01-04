@@ -11,9 +11,7 @@
 stack_extract <- function(dat,
                           state_stack,
                           var = c("tmean", "ppt", "tmin", "tmax", "vpdmax", "vpdmin", "tdmean"),
-                          dates = NULL
-                          ) {
-
+                          dates = NULL) {
   if (!is.null(dates)) {
     original_length <- terra::nlyr(state_stack)
 
@@ -38,13 +36,22 @@ stack_extract <- function(dat,
     # subset the stack to only those layers
     state_stack <- state_stack[[matching_layers]]
 
-    message(paste("Extracting", length(matching_layers), "of",
-                  original_length, "possible layers due to dates argument."))
+    message(
+      paste(
+        "Extracting",
+        length(matching_layers),
+        "of",
+        original_length,
+        "possible layers due to dates argument."
+      )
+    )
   }
 
   dat_sf <- dat %>% sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326) %>%
     dplyr::group_by(geometry) %>%
-    dplyr::summarise(dum = sum(total), .groups = "drop")
+    dplyr::summarise(dum = sum(total),
+                     .groups = "drop",
+                     na.rm = T)
 
   # when transforming to the different CRS, there is a slight shift in coordinates. Add them back
   orig_coords <- dat_sf %>%
