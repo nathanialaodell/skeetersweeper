@@ -86,18 +86,24 @@ prism8_daily <- function(var,
             file.exists(file.path(dir, paste0(sn, "_", v, "_", day, ".tif")))
           }))
           if (all_exist)
-            print(paste("Skipping", day, ": .tif already in directory!", sep = " ")) next
+            print(paste("Skipping", day, ": .tif already in directory!", sep = " ")) {
+              next
+            }
         } else {
           # check if single state .tif file exists
           if (file.exists(file.path(dir, paste0(
             state_name, "_", v, "_", day, ".tif"
-          ))))
-            print(paste("Skipping", day, ": .tif already in directory!", sep = " ")) next
+          )))) {
+            print(paste("Skipping", day, ": .tif already in directory!", sep = " "))
+            next
+          }
         }
       } else {
         # check if US .tif file exists
-        if (file.exists(file.path(dir, paste0("US_", v, "_", day, ".tif"))))
-          print(paste("Skipping", day, ": .tif already in directory!", sep = " ")) next
+        if (file.exists(file.path(dir, paste0("US_", v, "_", day, ".tif")))) {
+          print(paste("Skipping", day, ": .tif already in directory!", sep = " "))
+          next
+        }
       }
 
       url <- paste0(base_url, "/", v, "/", day, "?format=bil")
