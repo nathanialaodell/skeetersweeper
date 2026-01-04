@@ -75,11 +75,6 @@ prism8_daily <- function(var,
       dates <- seq(as.Date(start_date), as.Date(end_date), by = "1 day")
     }
 
-    for (i in seq_along(dates)) {
-      if (progress) {
-        print(paste("File", i, "of", length(dates), sep = " "))
-      }
-
       # turning dates into readable strings to attach to the URL
       day <- strftime(dates[i], "%Y%m%d")
 
@@ -108,6 +103,10 @@ prism8_daily <- function(var,
       url <- paste0(base_url, "/", v, "/", day, "?format=bil")
 
       # download file into specified folder
+      for (i in seq_along(dates)) {
+        if (progress) {
+          print(paste("File", i, "of", length(dates), sep = " "))
+        }
 
       dest_file <- file.path(dir, paste0(v, "_", day, ".bil.zip"))
 
