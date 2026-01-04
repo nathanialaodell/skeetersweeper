@@ -82,11 +82,36 @@ prism8_daily <- function(var,
 
       # turning dates into readable strings to attach to the URL
       day <- strftime(dates[i], "%Y%m%d")
+
+      # check if output .tif file(s) already exist
+      if (!missing(template)) {
+        if (is.list(template)) {
+          # check if all state .tif files exist
+          all_exist <- all(sapply(state_name, function(sn) {
+            file.exists(file.path(dir, paste0(sn, "_", v, "_", day, ".tif")))
+          }))
+          if (all_exist)
+            next
+        } else {
+          # check if single state .tif file exists
+          if (file.exists(file.path(dir, paste0(
+            state_name, "_", v, "_", day, ".tif"
+          ))))
+            next
+        }
+      } else {
+        # check if US .tif file exists
+        if (file.exists(file.path(dir, paste0("US_", v, "_", day, ".tif"))))
+          next
+      }
+
       url <- paste0(base_url, "/", v, "/", day, "?format=bil")
 
       # download file into specified folder
 
       dest_file <- file.path(dir, paste0(v, "_", day, ".bil.zip"))
+
+
       download.file(url, destfile = dest_file, mode = "wb")
 
       ex_fl <- unzip(dest_file, exdir = dir)
