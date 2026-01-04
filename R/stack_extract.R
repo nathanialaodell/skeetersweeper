@@ -3,14 +3,42 @@
 #' @param dat Data frame. Must contain longitude and latitude columns.
 #' @param state_stack Raster stack containing climate data for a state.
 #' @param var Character. One of "tmean", "ppt", "tmin", "tmax", "vpdmax", or "tdmean" (variables extractable in prism8_daily).
+#' @param dates Vector of dates. Optional, but HIGHLY recommended to provide this argument to avoid intense memory load.
 
 #' @export
 
 # tif extraction helper
 stack_extract <- function(dat,
                           state_stack,
-                          var = c("tmean", "ppt", "tmin", "tmax", "vpdmax", "vpdmin", "tdmean")
+                          var = c("tmean", "ppt", "tmin", "tmax", "vpdmax", "vpdmin", "tdmean"),
+                          dates = NULL
                           ) {
+
+  if (!is.null(dates)) {
+    # create pattern for the variable
+    var_pattern <- paste0("prism_", var, "_")
+
+    # convert dates to the format in layer names (YYYYMMDD)
+    date_strings <- format(as.Date(dates), "%Y%m%d")
+
+    # get layer names
+    layer_names <- names(state_stack)
+
+    # find which layers match our dates
+    matching_layers <- sapply(date_strings, function(d) {
+      grep(d, layer_names, value = FALSE)
+    }) %>% unlist() %>% unique()
+
+    if (length(matching_layers) == 0) {
+      stop("No layers found matching the provided dates")
+    }
+
+    # subset the stack to only those layers
+    state_stack <- state_stack[[matching_layers]]
+
+    message(paste("Extracting", length(matching_layers), "of",
+                  terra::nlyr(state_stack), "layers"))
+  }
 
   dat_sf <- dat %>% sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326) %>%
     dplyr::group_by(geometry) %>%

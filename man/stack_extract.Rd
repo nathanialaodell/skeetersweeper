@@ -7,7 +7,8 @@
 stack_extract(
   dat,
   state_stack,
-  var = c("tmean", "ppt", "tmin", "tmax", "vpdmax", "vpdmin", "tdmean")
+  var = c("tmean", "ppt", "tmin", "tmax", "vpdmax", "vpdmin", "tdmean"),
+  dates = NULL
 )
 }
 \arguments{
@@ -16,6 +17,8 @@ stack_extract(
 \item{state_stack}{Raster stack containing climate data for a state.}
 
 \item{var}{Character. One of "tmean", "ppt", "tmin", "tmax", "vpdmax", or "tdmean" (variables extractable in prism8_daily).}
+
+\item{dates}{Vector of dates. Optional, but HIGHLY recommended to provide this argument to avoid intense memory load.}
 }
 \description{
 Extract .tif data to trap points
