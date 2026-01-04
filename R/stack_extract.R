@@ -15,6 +15,8 @@ stack_extract <- function(dat,
                           ) {
 
   if (!is.null(dates)) {
+    orginal_length <- terra::nlyr(state_stack)
+
     # create pattern for the variable
     var_pattern <- paste0("prism_", var, "_")
 
