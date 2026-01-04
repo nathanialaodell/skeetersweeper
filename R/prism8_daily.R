@@ -75,38 +75,38 @@ prism8_daily <- function(var,
       dates <- seq(as.Date(start_date), as.Date(end_date), by = "1 day")
     }
 
-      # turning dates into readable strings to attach to the URL
-      day <- strftime(dates[i], "%Y%m%d")
+    # turning dates into readable strings to attach to the URL
+    day <- strftime(dates[i], "%Y%m%d")
 
-      # check if output .tif file(s) already exist
-      if (!missing(template)) {
-        if (is.list(template)) {
-          # check if all state .tif files exist
-          all_exist <- all(sapply(state_name, function(sn) {
-            file.exists(file.path(dir, paste0(sn, "_", v, "_", day, ".tif")))
-          }))
-          if (all_exist)
-            next
-        } else {
-          # check if single state .tif file exists
-          if (file.exists(file.path(dir, paste0(
-            state_name, "_", v, "_", day, ".tif"
-          ))))
-            next
-        }
+    # check if output .tif file(s) already exist
+    if (!missing(template)) {
+      if (is.list(template)) {
+        # check if all state .tif files exist
+        all_exist <- all(sapply(state_name, function(sn) {
+          file.exists(file.path(dir, paste0(sn, "_", v, "_", day, ".tif")))
+        }))
+        if (all_exist)
+          print(paste("Skipping", day, ": .tif already in directory!", sep = " ")) next
       } else {
-        # check if US .tif file exists
-        if (file.exists(file.path(dir, paste0("US_", v, "_", day, ".tif"))))
-          next
+        # check if single state .tif file exists
+        if (file.exists(file.path(dir, paste0(
+          state_name, "_", v, "_", day, ".tif"
+        ))))
+          print(paste("Skipping", day, ": .tif already in directory!", sep = " ")) next
       }
+    } else {
+      # check if US .tif file exists
+      if (file.exists(file.path(dir, paste0("US_", v, "_", day, ".tif"))))
+        print(paste("Skipping", day, ": .tif already in directory!", sep = " ")) next
+    }
 
-      url <- paste0(base_url, "/", v, "/", day, "?format=bil")
+    url <- paste0(base_url, "/", v, "/", day, "?format=bil")
 
-      # download file into specified folder
-      for (i in seq_along(dates)) {
-        if (progress) {
-          print(paste("File", i, "of", length(dates), sep = " "))
-        }
+    # download file into specified folder
+    for (i in seq_along(dates)) {
+      if (progress) {
+        print(paste("File", i, "of", length(dates), sep = " "))
+      }
 
       dest_file <- file.path(dir, paste0(v, "_", day, ".bil.zip"))
 
