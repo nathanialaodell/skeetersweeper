@@ -2,6 +2,7 @@
 
 export(prism8_daily)
 export(process_state_tifs)
+export(stack_extract)
 export(sweep_fun)
 import(dplyr)
 import(janitor)

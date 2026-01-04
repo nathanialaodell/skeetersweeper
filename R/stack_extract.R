@@ -6,6 +6,8 @@
 #' @param lon_ol Character.
 #' @param lat_col Character.
 #' @param crs_in Numeric. The coordinate reference system to apply to dat.
+#'
+#' @export
 
 # tif extraction helper
 stack_extract <- function(dat,
