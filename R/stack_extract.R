@@ -52,7 +52,7 @@ stack_extract <- function(dat,
 
   # Convert to data.table and get unique coordinates
   dat_dt <- data.table::as.data.table(dat)
-  unique_coords <- unique(dat_dt[, .(latitude, longitude)])
+  unique_coords <- unique(dat_dt[, .(longitude, latitude)])
 
   # Create sf object
   dat_sf <- sf::st_as_sf(unique_coords,
