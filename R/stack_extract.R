@@ -4,6 +4,8 @@
 #' @param state_stack Raster stack containing climate data for a state.
 #' @param var Character. One of "tmean", "ppt", "tmin", "tmax", "vpdmax", or "tdmean" (variables extractable in prism8_daily).
 #' @param dates Vector of dates. Optional, but HIGHLY recommended to provide this argument to avoid intense memory load.
+#'
+#' @import data.table
 
 #' @export
 
@@ -46,7 +48,7 @@ stack_extract <- function(dat,
 
   # Convert to data.table and get unique coordinates
   dat_dt <- as.data.table(dat)
-  unique_coords <- unique(dat_dt[, .(latitude, longitude)])
+  unique_coords <- data.table::unique(dat_dt[, .(latitude, longitude)])
 
   # Create sf object
   dat_sf <- sf::st_as_sf(unique_coords,
