@@ -47,18 +47,12 @@ stack_extract <- function(dat,
     )
   }
 
-  dat_sf <- dat %>% sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326) %>%
+  dat_sf <- dat %>% sf::st_as_sf(coords = c("longitude", "latitude"), remove = FALSE, crs = 4326) %>%
     dplyr::group_by(geometry) %>%
-    dplyr::summarise(dum = sum(total),
-                     .groups = "drop",
-                     na.rm = T)
+  dplyr::distinct(latitude, longitude)
 
   # when transforming to the different CRS, there is a slight shift in coordinates. Add them back
   orig_coords <- dat_sf %>%
-    dplyr::mutate(
-      longitude = sf::st_coordinates(.)[, 1],
-      latitude = sf::st_coordinates(.)[, 2]
-    ) %>%
     sf::st_drop_geometry()
 
   dat_sf <- sf::st_transform(dat_sf, terra::crs(state_stack))
