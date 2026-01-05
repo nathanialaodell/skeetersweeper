@@ -15,7 +15,12 @@ stack_extract <- function(dat,
                           var = c("tmean", "ppt", "tmin", "tmax", "vpdmax", "vpdmin", "tdmean"),
                           dates = NULL) {
 
-  require(data.table)
+  if (!requireNamespace("data.table", quietly = TRUE)) {
+    stop("Package 'data.table' is required but not installed.")
+  }
+
+  # Match argument
+  var <- match.arg(var)
 
   if (!is.null(dates)) {
     original_length <- terra::nlyr(state_stack)
@@ -29,7 +34,6 @@ stack_extract <- function(dat,
     matching_layers <- unique(unlist(lapply(date_strings, function(d) {
       grep(d, layer_names, value = FALSE)
     })))
-
     if (length(matching_layers) == 0) {
       stop("No layers found matching the provided dates")
     }
@@ -47,8 +51,8 @@ stack_extract <- function(dat,
   }
 
   # Convert to data.table and get unique coordinates
-  dat_dt <- as.data.table(dat)
-  unique_coords <- data.table::unique(dat_dt[, .(latitude, longitude)])
+  dat_dt <- data.table::as.data.table(dat)
+  unique_coords <- unique(dat_dt[, .(latitude, longitude)])
 
   # Create sf object
   dat_sf <- sf::st_as_sf(unique_coords,
@@ -57,7 +61,7 @@ stack_extract <- function(dat,
                          crs = 4326)
 
   # Store original coordinates
-  orig_coords <- as.data.table(sf::st_drop_geometry(dat_sf))
+  orig_coords <- data.table::as.data.table(sf::st_drop_geometry(dat_sf))
 
   # Transform to state_stack CRS
   dat_sf <- sf::st_transform(dat_sf, terra::crs(state_stack))
@@ -68,26 +72,26 @@ stack_extract <- function(dat,
   extracted_points <- terra::extract(state_stack, terra::vect(dat_sf), xy = FALSE)
 
   # Convert to data.table and add original coordinates
-  extracted_dt <- as.data.table(extracted_points)
+  extracted_dt <- data.table::as.data.table(extracted_points)
   extracted_dt[, c("longitude", "latitude") := orig_coords]
 
   # Melt to long format
   id_vars <- c("ID", "longitude", "latitude")
   value_vars <- names(extracted_dt)[grepl(var_pattern, names(extracted_dt))]
 
-  extracted_long <- melt(extracted_dt,
-                         id.vars = id_vars,
-                         measure.vars = value_vars,
-                         variable.name = "date_string",
-                         value.name = var)
+  extracted_long <- data.table::melt(extracted_dt,
+                                     id.vars = id_vars,
+                                     measure.vars = value_vars,
+                                     variable.name = "date_string",
+                                     value.name = var)
 
   # Process date strings
   extracted_long[, date_string := gsub(paste0(var_pattern, "us_30s_"), "", date_string)]
   extracted_long[, date := as.Date(date_string, format = "%Y%m%d")]
 
-  # Select and reorder columns
+  # Select and reorder columns, remove ID column
   result <- extracted_long[, .(date, longitude, latitude, get(var))]
-  setnames(result, "V4", var)
+  data.table::setnames(result, "V4", var)
 
   return(result)
 }
