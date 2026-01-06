@@ -64,7 +64,7 @@ stack_extract <- function(dat,
   orig_coords <- data.table::as.data.table(sf::st_drop_geometry(dat_sf))
 
   # transform to spatvector
-  state_vect <- terra::vector(dat_sf)
+  state_vect <- terra::vect(dat_sf)
   state_vect_proj <- terra::project(state_vect, state_stack)
 
 
