@@ -67,15 +67,13 @@ stack_extract <- function(dat,
   state_vect <- terra::vect(dat_sf)
   state_vect_proj <- terra::project(state_vect, state_stack)
 
-
-
   var_pattern <- paste0("prism_", var, "_")
 
   # extract values
-  extracted_points <- terra::extract(state_stack, terra::vect(dat_sf), xy = FALSE)
+  extracted_points <- terra::extract(x = state_stack, y = state_vect_proj, xy = FALSE)
 
   # convert to data.table and add original coordinates
-  extracted_dt <- data.table::as.data.table(extracted_points)
+  extracted_dt <- data.table::setDT(extracted_points)
   extracted_dt[, c("longitude", "latitude") := orig_coords]
 
   # melt to long format
