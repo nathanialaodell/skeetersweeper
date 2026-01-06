@@ -50,32 +50,35 @@ stack_extract <- function(dat,
     )
   }
 
-  # Convert to data.table and get unique coordinates
+  # convert to data.table and get unique coordinates
   dat_dt <- data.table::as.data.table(dat)
   unique_coords <- unique(dat_dt[, .(longitude, latitude)])
 
-  # Create sf object
+  # create sf object
   dat_sf <- sf::st_as_sf(unique_coords,
                          coords = c("longitude", "latitude"),
                          remove = FALSE,
                          crs = 4326)
 
-  # Store original coordinates
+  # store original coordinates
   orig_coords <- data.table::as.data.table(sf::st_drop_geometry(dat_sf))
 
-  # Transform to state_stack CRS
-  dat_sf <- sf::st_transform(dat_sf, terra::crs(state_stack))
+  # transform to spatvector
+  state_vect <- terra::vector(dat_sf)
+  state_vect_proj <- terra::project(state_vect, state_stack)
+
+
 
   var_pattern <- paste0("prism_", var, "_")
 
-  # Extract values
+  # extract values
   extracted_points <- terra::extract(state_stack, terra::vect(dat_sf), xy = FALSE)
 
-  # Convert to data.table and add original coordinates
+  # convert to data.table and add original coordinates
   extracted_dt <- data.table::as.data.table(extracted_points)
   extracted_dt[, c("longitude", "latitude") := orig_coords]
 
-  # Melt to long format
+  # melt to long format
   id_vars <- c("ID", "longitude", "latitude")
   value_vars <- names(extracted_dt)[grepl(var_pattern, names(extracted_dt))]
 
@@ -85,11 +88,11 @@ stack_extract <- function(dat,
                                      variable.name = "date_string",
                                      value.name = var)
 
-  # Process date strings
+  # process date strings
   extracted_long[, date_string := gsub(paste0(var_pattern, "us_30s_"), "", date_string)]
   extracted_long[, date := as.Date(date_string, format = "%Y%m%d")]
 
-  # Select and reorder columns, remove ID column
+  # select and reorder columns, remove ID column
   result <- extracted_long[, .(date, longitude, latitude, get(var))]
   data.table::setnames(result, "V4", var)
 
