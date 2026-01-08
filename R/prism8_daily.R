@@ -148,7 +148,8 @@ prism8_daily <- function(var,
             out <- terra::project(out, CRS)
 
             terra::writeRaster(out,
-                               paste0(dir, "/", state_name[k], "_", v, "_", day, ".tif"))
+                               paste0(dir, "/", state_name[k], "_", v, "_", day, ".tif"),
+                               overwrite = TRUE)
           }
         }
 
@@ -157,13 +158,15 @@ prism8_daily <- function(var,
           out <- terra::project(out, CRS)
 
           terra::writeRaster(out,
-                             paste0(dir, "/", state_name, "_", v, "_", day, ".tif"))
+                             paste0(dir, "/", state_name, "_", v, "_", day, ".tif"),
+                             overwrite = TRUE)
         }
 
       }
 
       else {
-        terra::writeRaster(dat, paste0(dir, "/US_", v, "_", day, ".tif"))
+        terra::writeRaster(dat, paste0(dir, "/US_", v, "_", day, ".tif"),
+                           overwrite = TRUE)
       }
 
       # remove everything that isn't a .tif prior to moving on to the next date
