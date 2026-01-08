@@ -30,7 +30,7 @@ process_state_tifs <- function(state_name,
 
   if(write)
     # write the main stack
-    terra::writeRaster(state_stack, save_path, overwrite = FALSE)
+    terra::writeRaster(state_stack, save_path, overwrite = TRUE)
 
   # remove original files
   if (remove) {
