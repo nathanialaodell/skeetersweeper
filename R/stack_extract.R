@@ -4,6 +4,7 @@
 #' @param state_stack Raster stack containing climate data for a state.
 #' @param var Character. One of "tmean", "ppt", "tmin", "tmax", "vpdmax", or "tdmean" (variables extractable in prism8_daily).
 #' @param dates Vector of dates. Optional, but HIGHLY recommended to provide this argument to avoid intense memory load.
+#' @param buffer Numeric. The buffer (meters) to extract raster data to. If missing, then extracted values will be at the point.
 #'
 #' @import data.table
 
@@ -13,7 +14,8 @@
 stack_extract <- function(dat,
                           state_stack,
                           var = c("tmean", "ppt", "tmin", "tmax", "vpdmax", "vpdmin", "tdmean"),
-                          dates = NULL) {
+                          dates = NULL,
+                          buffer) {
 
   if (!requireNamespace("data.table", quietly = TRUE)) {
     stop("Package 'data.table' is required but not installed.")
@@ -66,6 +68,10 @@ stack_extract <- function(dat,
   # transform to spatvector
   state_vect <- terra::vect(dat_sf)
   state_vect_proj <- terra::project(state_vect, state_stack)
+
+  if(!missing(buffer)){
+    state_vect_proj <- terra::buffer(state_vect_proj, width = buffer)
+  }
 
   var_pattern <- paste0("prism_", var, "_")
 
