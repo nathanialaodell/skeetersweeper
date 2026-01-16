@@ -15,90 +15,82 @@ stack_extract <- function(dat,
                           state_stack,
                           var = c("tmean", "ppt", "tmin", "tmax", "vpdmax", "vpdmin", "tdmean"),
                           dates = NULL,
-                          buffer) {
+                          buffer = NULL) {
 
   if (!requireNamespace("data.table", quietly = TRUE)) {
     stop("Package 'data.table' is required but not installed.")
   }
 
-  # Match argument
   var <- match.arg(var)
 
+  # -------------------------------
+  # 1. Parse layer names
+  # -------------------------------
+  layer_names <- names(state_stack)
+
+  # Expecting: prism_var_us_30s_YYYYMMDD
+  layer_dt <- data.table::data.table(
+    layer = layer_names,
+    date = as.Date(sub(".*_(\\d{8})$", "\\1", layer_names), "%Y%m%d")
+  )
+
+  # -------------------------------
+  # 2. Subset by dates if provided
+  # -------------------------------
   if (!is.null(dates)) {
-    original_length <- terra::nlyr(state_stack)
-    # create pattern for the variable
-    var_pattern <- paste0("prism_", var, "_")
-    # convert dates to the format in layer names (YYYYMMDD)
-    date_strings <- format(as.Date(dates), "%Y%m%d")
-    # get layer names
-    layer_names <- names(state_stack)
-    # find which layers match our dates
-    matching_layers <- unique(unlist(lapply(date_strings, function(d) {
-      grep(d, layer_names, value = FALSE)
-    })))
-    if (length(matching_layers) == 0) {
+    target_dates <- as.Date(dates)
+
+    matched <- layer_dt[date %in% target_dates]
+
+    if (nrow(matched) == 0) {
       stop("No layers found matching the provided dates")
     }
-    # subset the stack to only those layers
-    state_stack <- state_stack[[matching_layers]]
-    message(
-      paste(
-        "Extracting",
-        length(matching_layers),
-        "of",
-        original_length,
-        "possible layers due to dates argument."
-      )
-    )
+
+    state_stack <- state_stack[[matched$layer]]
+    layer_dt <- matched
   }
 
-  # convert to data.table and get unique coordinates
+  # -------------------------------
+  # 3. Unique coordinates
+  # -------------------------------
   dat_dt <- data.table::as.data.table(dat)
   unique_coords <- unique(dat_dt[, .(longitude, latitude)])
 
-  # create sf object
-  dat_sf <- sf::st_as_sf(unique_coords,
+  pts_sf <- sf::st_as_sf(unique_coords,
                          coords = c("longitude", "latitude"),
-                         remove = FALSE,
                          crs = 4326)
 
-  # store original coordinates
-  orig_coords <- data.table::as.data.table(sf::st_drop_geometry(dat_sf))
+  pts_vect <- terra::vect(pts_sf)
+  pts_vect <- terra::project(pts_vect, state_stack)
 
-  # transform to spatvector
-  state_vect <- terra::vect(dat_sf)
-  state_vect_proj <- terra::project(state_vect, state_stack)
-
-  if(!missing(buffer)){
-    state_vect_proj <- terra::buffer(state_vect_proj, width = buffer)
+  if (!is.null(buffer)) {
+    pts_vect <- terra::buffer(pts_vect, width = buffer)
   }
 
-  var_pattern <- paste0("prism_", var, "_")
+  # -------------------------------
+  # 4. Extract values
+  # -------------------------------
+  extracted <- terra::extract(state_stack, pts_vect, xy = FALSE)
+  extracted_dt <- data.table::as.data.table(extracted)
+  extracted_dt[, c("longitude", "latitude") := unique_coords]
 
-  # extract values
-  extracted_points <- terra::extract(x = state_stack, y = state_vect_proj, xy = FALSE)
+  # -------------------------------
+  # 5. Melt to long format
+  # -------------------------------
+  long_dt <- data.table::melt(
+    extracted_dt,
+    id.vars = c("ID", "longitude", "latitude"),
+    variable.name = "layer",
+    value.name = var
+  )
 
-  # convert to data.table and add original coordinates
-  extracted_dt <- data.table::setDT(extracted_points)
-  extracted_dt[, c("longitude", "latitude") := orig_coords]
+  long_dt <- merge(long_dt, layer_dt, by = "layer")
 
-  # melt to long format
-  id_vars <- c("ID", "longitude", "latitude")
-  value_vars <- names(extracted_dt)[grepl(var_pattern, names(extracted_dt))]
+  # -------------------------------
+  # 6. Final tidy output
+  # -------------------------------
+  out <- long_dt[, .(date, longitude, latitude, get(var))]
+  data.table::setnames(out, "V4", var)
 
-  extracted_long <- data.table::melt(extracted_dt,
-                                     id.vars = id_vars,
-                                     measure.vars = value_vars,
-                                     variable.name = "date_string",
-                                     value.name = var)
-
-  # process date strings
-  extracted_long[, date_string := gsub(paste0(var_pattern, "us_30s_"), "", date_string)]
-  extracted_long[, date := as.Date(date_string, format = "%Y%m%d")]
-
-  # select and reorder columns, remove ID column
-  result <- extracted_long[, .(date, longitude, latitude, get(var))]
-  data.table::setnames(result, "V4", var)
-
-  return(result)
+  return(out)
 }
