@@ -1,0 +1,21 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: skeetersweeper
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Nathanial
+    family-names: O'Dell
+    email: naodell@uw.edu
+    affiliation: University of Washington
+    orcid: 'https://orcid.org/0009-0009-8048-3551'
+repository-code: 'https://github.com/nathanialaodell/skeetersweeper'
+abstract: >-
+  An R package for preparing mosquito surveillance data for
+  analysis.
+license: CDLA-Permissive-1.0
+date-released: '2026-01-04'
