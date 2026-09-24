@@ -64,7 +64,7 @@ prism8_daily <- function(var,
                          state_name = NULL,
                          progress = TRUE) {
   base_url <- "https://services.nacse.org/prism/data/get/us/800m"
-  CRS = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"
+  CRS = st_crs(template)
 
   for (v in var) {
     if (!is.null(date_list)) {
