@@ -64,7 +64,7 @@ prism8_daily <- function(var,
                          state_name = NULL,
                          progress = TRUE) {
   base_url <- "https://services.nacse.org/prism/data/get/us/800m"
-  CRS = st_crs(template)
+  CRS <- terra::crs(template)
 
   for (v in var) {
     if (!is.null(date_list)) {
@@ -114,11 +114,6 @@ prism8_daily <- function(var,
       }
 
       dest_file <- file.path(dir, paste0(v, "_", day, ".bil.zip"))
-
-<<<<<<< Updated upstream
-=======
-      if (dest_file | )
->>>>>>> Stashed changes
 
       download.file(url, destfile = dest_file, mode = "wb")
 
