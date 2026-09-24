@@ -115,6 +115,10 @@ prism8_daily <- function(var,
 
       dest_file <- file.path(dir, paste0(v, "_", day, ".bil.zip"))
 
+<<<<<<< Updated upstream
+=======
+      if (dest_file | )
+>>>>>>> Stashed changes
 
       download.file(url, destfile = dest_file, mode = "wb")
 
