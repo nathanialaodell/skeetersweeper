@@ -8,8 +8,10 @@
 #' @param date_list List of date. If you already know which dates you'd like to download data frame, use this to avoid downloading irrelevant data. Preferred method.
 #' @param bil Logical. Removes all extracted files that do not end in .bil or .hdr; which are the minimum files needed to build a raster. Defaults to TRUE.
 #' @param template bbox. The extent(s) to which to crop downloaded data. Can be a list.
+#' @param crs_type Character. What crs are you cropping to?
 #' @param state_name Character. If template is not missing, then the state(s) for which the bounding box is pulled from. Used for writing raster images.
 #' @param progress Logical. Whether to create a message in the console at the beginning of each file download initialization.
+#' @param retries Numeric. How many retries on failed downloads before stopping the loop?
 #' @examples
 #'
 #' # downloading precipitation, temp mean, min, and max data for Texas and Oregon
@@ -33,6 +35,7 @@
 #' start_date = "2025-12-25",
 #' end_date = "2025-12-26",
 #' template = boxes,
+#' crs_type = 'epsg:4087',
 #' state_name = c("OR", "TX")
 #' )
 #'
@@ -62,10 +65,13 @@ prism8_daily <- function(var,
                          bil = TRUE,
                          template,
                          crs_type,
+                         retries = 5,
                          state_name = NULL,
                          progress = TRUE) {
   base_url <- "https://services.nacse.org/prism/data/get/us/800m"
   CRS <- crs_type
+  retry_delay <- 5
+  failures <- character(0)
 
   for (v in var) {
     if (!is.null(date_list)) {
@@ -88,8 +94,8 @@ prism8_daily <- function(var,
           }))
           if (all_exist) {
             print(paste0("Skipping ", as.Date(day, format = "%Y%m%d"), ": .tif already in directory!"))
-              next
-            }
+            next
+          }
         } else {
           # check if single state .tif file exists
           if (file.exists(file.path(dir, paste0(
@@ -116,64 +122,98 @@ prism8_daily <- function(var,
 
       dest_file <- file.path(dir, paste0(v, "_", day, ".bil.zip"))
 
-      download.file(url, destfile = dest_file, mode = "wb")
+      # random download errors are ending long downloads at an annoying rate
+      # need to force retry these in the background before ending the loop.
 
-      ex_fl <- unzip(dest_file, exdir = dir)
+      attempt <- 1
+      success <- FALSE
 
-      # remove .zip folder (default)
-      if (remove) {
-        file.remove(dest_file)
-      }
+      while (!success && attempt <= retries) {
+        result <- tryCatch({
 
-      # .bil and .hdr are needed to build rasters, nothing else. remove others ASAP
+          download.file(url, destfile = dest_file, mode = "wb")
 
-      irrelevant <- ex_fl[!grepl("\\.bil$|\\.hdr$", ex_fl)]
-      file.remove(irrelevant)
+          ex_fl <- unzip(dest_file, exdir = dir)
 
-      relevant <- ex_fl[grepl("\\.bil$|\\.hdr$", ex_fl)]
+          if (length(ex_fl) == 0) {
+            stop("unzip produced no files (likely a corrupt or incomplete download)")
+          }
 
-      # as in shapefiles in 'sf', only need to call in the .bil for rasters
+          # remove .zip folder (default)
+          if (remove) {
+            file.remove(dest_file)
+          }
 
-      bil <- ex_fl[grepl("\\.bil$", ex_fl)]
+          # .bil and .hdr are needed to build rasters, nothing else. remove others ASAP
+          irrelevant <- ex_fl[!grepl("\\.bil$|\\.hdr$", ex_fl)]
+          if (length(irrelevant) > 0) file.remove(irrelevant)
 
-      dat <- terra::rast(bil)
+          relevant <- ex_fl[grepl("\\.bil$|\\.hdr$", ex_fl)]
 
-      # some instances where having the entire US may be useful, so giving the option here
-      if (!missing(template)) {
-        # cropping the read raster to relevant bounding boxes if multiple
+          bil_file <- ex_fl[grepl("\\.bil$", ex_fl)]
 
-        if (is.list(template)) {
-          for (k in seq_along(template)) {
-            out <- terra::crop(dat, sf::st_transform(template[[k]], terra::crs(dat)))
-            out <- terra::project(out, CRS)
+          dat <- terra::rast(bil_file)
 
-            terra::writeRaster(out,
-                               paste0(dir, "/", state_name[k], "_", v, "_", day, ".tif"),
+          if (!missing(template)) {
+            if (is.list(template)) {
+              for (k in seq_along(template)) {
+                out <- terra::crop(dat, sf::st_transform(template[[k]], terra::crs(dat)))
+                out <- terra::project(out, CRS)
+
+                terra::writeRaster(out,
+                                   paste0(dir, "/", state_name[k], "_", v, "_", day, ".tif"),
+                                   overwrite = TRUE)
+              }
+            } else {
+              out <- terra::crop(dat, sf::st_transform(template, terra::crs(dat)))
+              out <- terra::project(out, CRS)
+
+              terra::writeRaster(out,
+                                 paste0(dir, "/", state_name, "_", v, "_", day, ".tif"),
+                                 overwrite = TRUE)
+            }
+          } else {
+            terra::writeRaster(dat, paste0(dir, "/US_", v, "_", day, ".tif"),
                                overwrite = TRUE)
           }
+
+          # remove everything that isn't a .tif prior to moving on to the next date
+          if (length(relevant) > 0) file.remove(relevant)
+
+          terra::tmpFiles(remove = TRUE)
+
+          TRUE  # signal success to tryCatch's return value
+
+        }, error = function(e) {
+          message(sprintf(
+            "Attempt %d/%d failed for %s (%s): %s",
+            attempt, retries, v, day, conditionMessage(e)
+          ))
+
+          # best-effort cleanup of any partial files from this attempt before retrying
+          leftover <- list.files(dir, pattern = paste0("^", v, "_", day, "\\."), full.names = TRUE)
+          leftover <- c(leftover, list.files(dir, pattern = paste0("_", v, "_", day, "\\.bil|_", v, "_", day, "\\.hdr"), full.names = TRUE))
+          leftover <- unique(leftover)
+          if (length(leftover) > 0) suppressWarnings(file.remove(leftover))
+
+          FALSE  # signal failure
+        })
+
+        success <- isTRUE(result)
+
+        if (!success) {
+          attempt <- attempt + 1
+          if (attempt <= retries) {
+            Sys.sleep(retry_delay * (attempt - 1))  # simple linear backoff
+          }
         }
-
-        else {
-          out <- terra::crop(dat, sf::st_transform(template, terra::crs(dat)))
-          out <- terra::project(out, CRS)
-
-          terra::writeRaster(out,
-                             paste0(dir, "/", state_name, "_", v, "_", day, ".tif"),
-                             overwrite = TRUE)
-        }
-
       }
 
-      else {
-        terra::writeRaster(dat, paste0(dir, "/US_", v, "_", day, ".tif"),
-                           overwrite = TRUE)
+      if (!success) {
+        warning(sprintf("Giving up on %s (%s) after %d attempts", v, day, retries))
+        failures <- c(failures, paste0(v, "_", day))
+        next  # move on to the next date instead of stopping the whole run
       }
-
-      # remove everything that isn't a .tif prior to moving on to the next date
-      file.remove(relevant)
-
-      # terra will create temp files that won't be removed until the R session ends
-      terra::tmpFiles(remove = TRUE)
 
       # polite pause to not overload servers
       Sys.sleep(2)
@@ -184,4 +224,13 @@ prism8_daily <- function(var,
     }
 
   }
+
+  if (length(failures) > 0) {
+    warning(sprintf(
+      "prism8_daily finished with %d failed date(s): %s",
+      length(failures), paste(failures, collapse = ", ")
+    ))
+  }
+
+  invisible(failures)
 }
