@@ -61,10 +61,11 @@ prism8_daily <- function(var,
                          remove = TRUE,
                          bil = TRUE,
                          template,
+                         crs_type,
                          state_name = NULL,
                          progress = TRUE) {
   base_url <- "https://services.nacse.org/prism/data/get/us/800m"
-  CRS <- sf::st_crs(template)
+  CRS <- crs_type
 
   for (v in var) {
     if (!is.null(date_list)) {
