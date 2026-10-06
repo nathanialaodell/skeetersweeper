@@ -94,8 +94,8 @@ prism8_daily <- function(var,
           }))
           if (all_exist) {
             print(paste0("Skipping ", as.Date(day, format = "%Y%m%d"), ": .tif already in directory!"))
-              next
-            }
+            next
+          }
         } else {
           # check if single state .tif file exists
           if (file.exists(file.path(dir, paste0(
